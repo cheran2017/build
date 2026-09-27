@@ -209,7 +209,7 @@ export const stories: Story[] = [
   {
     id: "misty",
     name: "Misty",
-    stat: "0 → app",
+    stat: "First app", // 3D labels use Inter Tight's Latin set: no arrows or emoji
     statLabel: "no tech background",
     quote: "The community massively increased my productivity.",
     detail: "Misty had no tech experience. With the community behind her, she launched her app CartoViva.",

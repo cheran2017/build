@@ -23,6 +23,7 @@ import {
   VideoTexture,
 } from "three";
 import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry.js";
+import { configureTextBuilder } from "troika-three-text";
 import { ramp, type Journey, type WordSpec } from "@/lib/journey";
 import { aspectOf } from "@/lib/content";
 import { openVideo, scroll, type VideoRequest } from "@/lib/store";
@@ -237,6 +238,11 @@ export function ImagePanel({ src, w, frame = "dark", r = 0.22, pad = 0.12, depth
 /* ------------------------------------------------------------------ */
 /* Text                                                                */
 /* ------------------------------------------------------------------ */
+
+// Troika fetches fallback fonts from a public CDN when a label has a character the font lacks. Keep the site
+// self-contained: look on our own server instead, where nothing is published, so an unsupported character shows
+// up as a missing glyph and a console error (caught by qa:smoke) rather than a silent third-party request.
+configureTextBuilder({ unicodeFontsURL: "/fonts/no-unicode-fallback" });
 
 type LabelProps = ComponentProps<typeof Text> & { weight?: 500 | 700 | 800 };
 

@@ -308,7 +308,7 @@ stat monuments
 a closing proof line
 
 Visual ideas:
-five tall testimonial monoliths, alternating left and right, each with a big stat on top ("$200K+", "36 hrs", "7 days", "3 exits", "0 → app"), a short quote, and a floating screen beside it showing that member's launch post
+five tall testimonial monoliths, alternating left and right, each with a big stat on top ("$200K+", "36 hrs", "7 days", "3 exits", "First app"), a short quote, and a floating screen beside it showing that member's launch post
 launch post screens flying outward past the camera
 giant floating numbers: **500+**, **275+**, **21**
 a slightly faster camera with gentle banking on turns
@@ -331,7 +331,7 @@ Testimonial monoliths (overlay card on the opposite side, with a "Watch the stor
 > ## "Marcin helped me build and sell 3 SaaS businesses."
 > Started with the videos, built his own SaaS products, and just sold his third.
 
-> **Misty · Member** — 0 → app
+> **Misty · Member** — First app
 > ## "The community massively increased my productivity."
 > No tech background. With the community behind her, she launched CartoViva.
 
