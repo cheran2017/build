@@ -11,6 +11,8 @@ npm run dev        # http://localhost:3000
 npm run build && npm start
 ```
 
+When deploying, set `NEXT_PUBLIC_SITE_URL` (e.g. `https://utn.com`) so share previews use absolute URLs. The share image is generated at build time from `app/opengraph-image.tsx` (brand text only, no reference content); its words live in `seo` in `lib/content.ts`.
+
 Useful URLs while developing:
 
 | URL | What it does |
@@ -18,8 +20,8 @@ Useful URLs while developing:
 | `/?at=i3` | Jump to a journey key once loaded (keys are in `lib/journey.ts`, e.g. `r0`, `idea`, `p2`, `helix`, `s0`, `final`). Works in production too, so `?at=launch` is a shareable deep link |
 | `/?at=cross@-0.3` | Key plus an offset in beats |
 | `/?at=0.42` | Jump to a raw progress value (0–1) |
-| `/?view=classic` | The flat HTML fallback (shown automatically for reduced motion or no WebGL) |
-| `/?view=3d` | Force the 3D tour even with reduced motion on |
+| `/?view=classic` | The flat HTML fallback (shown automatically for reduced motion, no WebGL, or a software renderer such as SwiftShader, llvmpipe or Microsoft Basic Render Driver) |
+| `/?view=3d` | Force the 3D tour anyway (the software-GL QA scripts use this) |
 
 ## Where things live
 
@@ -60,6 +62,13 @@ To preview where ambient loops play before the real Higgsfield / Seedance files 
 | `npm run qa:fly` | `npm run dev` | Captures every transition at quarter points into contact sheets in `reference/screens/`, with draw calls per frame. Add `--mobile` via `node scripts/flythrough.mjs <url> --mobile` |
 | `npm run qa:smoke` | `npm run build && npm start` | Loader, no dev hooks, skip link first in tab order, chapter nav, video modal + Escape, render loop pauses under the plans and resumes, FAQ dialog, classic view has no canvas, no console errors |
 | `node scripts/dpr-check.mjs` | `npm run dev` | Watches the adaptive pixel ratio settle (software GL should drop it to the floor within a couple of seconds) |
+| `node scripts/program-audit.mjs` | `npm run dev` | Lists shader programs created after loading. Must be empty: each one compiles mid-scroll, which freezes Windows browsers for seconds |
+| `node scripts/perf.mjs <url> [--headful] [--only=@2x] [--repeat=2]` | `npm start` | Real-GPU frame times per chapter for laptop @1x, @2x and phone. Use `--headful` for numbers that match a real browser: headless Chrome's display-less swap chain adds multi-second stalls that visitors never see |
+| `node scripts/trace-stall.mjs <url>` | `npm start` | Chrome trace of a real-GPU scroll, summarising the longest tasks, for hunting one-off freezes |
+
+Two rules keep the journey freeze-free (both enforced by `program-audit`):
+- **Never put a light inside a world that shows and hides.** three specialises every shader on the number of visible lights, so a light switching on recompiles every material.
+- **New materials must exist when the loader finishes.** The warm-up in `Stage.tsx` compiles and draws everything behind the loader; anything created later compiles on first sight.
 
 Always run `qa:collide` after moving a keyframe or an exhibit: an overlapping path looks fine at the stops and only fails in between.
 

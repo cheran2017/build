@@ -28,11 +28,21 @@ await page.setViewport({ width: 1280, height: 800 });
 
 const ok = (label, cond) => console.log(`${cond ? "PASS" : "FAIL"}  ${label}`);
 
+// this browser renders in software, which the site should route to the classic view by default
+{
+  const probe = await browser.newPage();
+  await probe.goto(base, { waitUntil: "networkidle2" });
+  await probe.waitForFunction(() => document.querySelector(".classic") || document.querySelector(".journey"), { timeout: 30000 });
+  ok("software GL gets the classic view by default", (await probe.$(".classic")) !== null && (await probe.$("canvas")) === null);
+  await probe.close();
+}
+
+// everything below forces the tour, as ?view=3d does
 const t0 = Date.now();
-await page.goto(base, { waitUntil: "domcontentloaded" });
+await page.goto(`${base}?view=3d`, { waitUntil: "domcontentloaded" });
 const initialScripts = await page.$$eval("script[src]", (s) => s.map((e) => e.getAttribute("src")));
 await page.waitForFunction(() => !document.querySelector(".loader"), { timeout: 120000 });
-console.log(`studio ready in ${((Date.now() - t0) / 1000).toFixed(1)}s (software GL)`);
+console.log(`studio ready in ${((Date.now() - t0) / 1000).toFixed(1)}s (software GL, forced with ?view=3d)`);
 console.log(`initial <script> tags: ${initialScripts.length}`);
 console.log(`transferred: js ${(bytes.js / 1024).toFixed(0)} KB, images ${(bytes.img / 1024).toFixed(0)} KB, fonts ${(bytes.font / 1024).toFixed(0)} KB, other ${(bytes.other / 1024).toFixed(0)} KB`);
 

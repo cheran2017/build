@@ -29,7 +29,7 @@ const errors = [];
 page.on("pageerror", (e) => errors.push(e.message));
 page.on("console", (m) => m.type() === "error" && errors.push(m.text()));
 await page.setViewport(view);
-await page.goto(`${base}?at=0`, { waitUntil: "networkidle2", timeout: 120000 });
+await page.goto(`${base}?view=3d&at=0`, { waitUntil: "networkidle2", timeout: 120000 });
 await page.waitForFunction(() => !document.querySelector(".loader") && window.__utn, { timeout: 120000 });
 
 const points = await page.evaluate(() => {

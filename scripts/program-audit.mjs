@@ -17,7 +17,7 @@ const browser = await puppeteer.launch({
 });
 const page = await browser.newPage();
 await page.setViewport(mobile ? { width: 390, height: 844, isMobile: true, hasTouch: true } : { width: 1280, height: 800 });
-await page.goto(`${base}?at=0`, { waitUntil: "networkidle2", timeout: 120000 });
+await page.goto(`${base}?view=3d&at=0`, { waitUntil: "networkidle2", timeout: 120000 });
 await page.waitForFunction(() => !document.querySelector(".loader") && window.__utn && window.__utnGL, { timeout: 120000 });
 
 const initial = await page.evaluate(() => {

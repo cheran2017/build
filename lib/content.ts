@@ -30,6 +30,16 @@ export const brand = {
   tagline: "Build your app with AI.",
 };
 
+/** Search and share previews (page title, meta description, the generated share image). */
+export const seo = {
+  title: `${brand.name} · Build your app with AI`,
+  description:
+    "Go from idea to a launched product in 21 days. No code. No developers. Training, weekly live coaching, and a community of builders launching real apps with AI.", // REF: 21 days / coaching claims
+  shareHeadline: "Build your app with AI.",
+  shareLine: "From idea to a launched product.",
+  shareAlt: `${brand.name}: Build your app with AI. Idea, build, launch.`,
+};
+
 export const links = {
   join: "#plans", // TODO: UTN signup / community URL
   checkout: "#plans", // TODO: UTN checkout URL

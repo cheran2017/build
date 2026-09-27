@@ -13,7 +13,7 @@ const browser = await puppeteer.launch({
 });
 const page = await browser.newPage();
 await page.setViewport({ width: 1440, height: 900, deviceScaleFactor: 2 });
-await page.goto(`${base}?at=helix`, { waitUntil: "networkidle2", timeout: 120000 });
+await page.goto(`${base}?view=3d&at=helix`, { waitUntil: "networkidle2", timeout: 120000 });
 await page.waitForFunction(() => !document.querySelector(".loader") && window.__utnGL, { timeout: 120000 });
 
 const read = () => page.evaluate(() => window.__utnGL.getPixelRatio());

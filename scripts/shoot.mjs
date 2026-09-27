@@ -27,7 +27,7 @@ for (const at of points) {
   page.on("pageerror", (e) => logs.push(`[pageerror] ${e.message}`));
   await page.setViewport(mobile ? { width: 390, height: 844, deviceScaleFactor: 1, isMobile: true, hasTouch: true } : { width: 1440, height: 900 });
   // "join" = past the end of the journey, on the plans section
-  const url = `${base}?at=${encodeURIComponent(at === "join" ? "1" : at)}`;
+  const url = `${base}${base.includes("?") ? "&" : "?"}view=3d&at=${encodeURIComponent(at === "join" ? "1" : at)}`;
   const t0 = Date.now();
   await page.goto(url, { waitUntil: "networkidle2", timeout: 120000 });
   try {

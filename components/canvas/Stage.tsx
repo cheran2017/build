@@ -234,18 +234,28 @@ function Ready() {
       withAllVisible(scene, () => (compiling = gl.compileAsync(scene, camera)));
       await compiling;
       if (cancelled) return;
-      // warm-up draws from every stop, in one task so no real frame interleaves; CameraRig restores the camera next frame
+      // warm-up draws from every stop, in one task so no real frame interleaves; CameraRig restores the camera next frame.
+      // A 1x1 viewport: the point is compiling and uploading, not pixels (full-size draws cost ~20s on software GL)
       const s: CameraSample = { pos: new Vector3(), look: new Vector3(), bg: new Color(), fogNear: 10, fogFar: 100 };
       const near = camera.near;
-      withAllVisible(scene, () => {
-        for (const k of journey.keys) {
-          journey.sample(journey.p(k.id), s);
-          camera.position.copy(s.pos);
-          camera.lookAt(s.look);
-          camera.updateMatrixWorld();
-          gl.render(scene, camera);
-        }
-      });
+      const full = gl.getSize(new Vector2());
+      gl.setViewport(0, 0, 1, 1);
+      gl.setScissor(0, 0, 1, 1);
+      gl.setScissorTest(true);
+      try {
+        withAllVisible(scene, () => {
+          for (const k of journey.keys) {
+            journey.sample(journey.p(k.id), s);
+            camera.position.copy(s.pos);
+            camera.lookAt(s.look);
+            camera.updateMatrixWorld();
+            gl.render(scene, camera);
+          }
+        });
+      } finally {
+        gl.setScissorTest(false);
+        gl.setViewport(0, 0, full.x, full.y);
+      }
       camera.near = near;
       camera.updateProjectionMatrix();
       await nextFrame();
