@@ -32,7 +32,12 @@ export function LaunchWorld() {
   const w = L.words.launch;
 
   return (
-    <group ref={group}>
+    <>
+      {/* Outside the toggled group on purpose: three specialises every shader on the number of *visible* lights,
+          so a light that switches on with its world recompiles every material in the scene at that moment
+          (multi-second freezes on Windows). Its 60-unit falloff keeps it from touching the other worlds. */}
+      <pointLight position={[0, 2, w.center[2] + 8]} color={ACCENT} intensity={600} distance={60} decay={2} />
+      <group ref={group}>
       <Grid
         position={[0, 0, -790]}
         args={[180, 280]}
@@ -55,7 +60,6 @@ export function LaunchWorld() {
         <planeGeometry args={[w.size * 4.4, 0.35]} />
         <meshBasicMaterial color={ACCENT} toneMapped={false} />
       </mesh>
-      <pointLight position={[0, 2, w.center[2] + 8]} color={ACCENT} intensity={600} distance={60} decay={2} />
 
       {stories.map((s, i) => (
         <Monolith key={s.id} story={s} spot={L.launch.stories[i]} />
@@ -71,7 +75,8 @@ export function LaunchWorld() {
           </Label>
         </group>
       ))}
-    </group>
+      </group>
+    </>
   );
 }
 

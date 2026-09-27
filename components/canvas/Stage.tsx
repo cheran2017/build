@@ -1,9 +1,9 @@
 "use client";
 
-import { Suspense, useEffect, useMemo } from "react";
+import { Suspense, useContext, useEffect, useMemo } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Environment, Lightformer, useProgress, useTexture } from "@react-three/drei";
-import { Color, Fog, Material, MathUtils, Mesh, NeutralToneMapping, PerspectiveCamera, Texture, Vector2, Vector3 } from "three";
+import { Color, Fog, Material, MathUtils, Mesh, NeutralToneMapping, Object3D, PerspectiveCamera, Scene, Texture, Vector2, Vector3 } from "three";
 import type { CameraSample, Journey } from "@/lib/journey";
 import { sceneTextures } from "@/lib/content";
 import { getUI, scroll, setUI } from "@/lib/store";
@@ -23,6 +23,8 @@ const DPR = { desktop: [0.8, 1.75], mobile: [0.75, 1.5] } as const;
 export default function Stage({ journey }: { journey: Journey }) {
   const mobile = journey.mobile;
   const start = journey.keys[0].pos;
+  // ?adaptive=0 pins the pixel ratio at its maximum, for benchmarking (scripts/perf.mjs)
+  const adaptive = useMemo(() => new URLSearchParams(window.location.search).get("adaptive") !== "0", []);
   return (
     <Canvas
       className="stage"
@@ -53,7 +55,7 @@ export default function Stage({ journey }: { journey: Journey }) {
           <Finale />
           <Ready />
           {/* inside Suspense so it only starts measuring once everything has loaded and compiled */}
-          <AdaptiveQuality range={mobile ? DPR.mobile : DPR.desktop} />
+          {adaptive && <AdaptiveQuality range={mobile ? DPR.mobile : DPR.desktop} />}
         </Suspense>
         <LoadReporter />
         <PauseWhenCovered />
@@ -176,24 +178,83 @@ function CameraRig({ journey }: { journey: Journey }) {
   return null;
 }
 
-/** Mounts once everything inside Suspense has loaded, then waits a frame so the first image is real. */
+const nextFrame = () => new Promise<void>((r) => requestAnimationFrame(() => r()));
+
+/** Runs `fn` with every object in the scene visible (worlds hide themselves outside their slice of the journey). */
+function withAllVisible(scene: Scene, fn: () => void) {
+  const hidden: Object3D[] = [];
+  scene.traverse((o) => {
+    if (!o.visible) {
+      hidden.push(o);
+      o.visible = true;
+    }
+  });
+  try {
+    fn();
+  } finally {
+    hidden.forEach((o) => (o.visible = false));
+  }
+}
+
+/**
+ * Mounts once everything inside Suspense has loaded, and pays every first-use cost behind the loader.
+ * three's compile() only sees *visible* objects, so with the worlds hidden their shaders would compile the moment
+ * each world appears: multi-second freezes on Windows/ANGLE, where every shader goes through the D3D compiler.
+ * So: show everything, compile (in parallel where supported), then draw one frame from every camera stop so
+ * buffer uploads and driver work happen now too.
+ */
 function Ready() {
   const gl = useThree((s) => s.gl);
   const scene = useThree((s) => s.scene);
-  const camera = useThree((s) => s.camera);
+  const camera = useThree((s) => s.camera) as PerspectiveCamera;
+  const journey = useContext(JourneyContext)!;
   useEffect(() => {
     if (process.env.NODE_ENV !== "production") Object.assign(window, { __utnGL: gl, __utnScene: scene, __utnCam: camera });
-    // upload every texture and compile every shader now, not mid-scroll
-    scene.traverse((o) => {
-      const mat = (o as Mesh).material as (Material & { map?: Texture | null; uniforms?: Record<string, { value: unknown }> }) | undefined;
-      if (!mat || Array.isArray(mat)) return;
-      const tex = mat.map ?? (mat.uniforms?.map?.value as Texture | undefined);
-      if (tex instanceof Texture) gl.initTexture(tex);
-    });
-    gl.compile(scene, camera);
-    const id = requestAnimationFrame(() => setUI({ ready: true, loaded: 100 }));
-    return () => cancelAnimationFrame(id);
-  }, [gl, scene, camera]);
+    let cancelled = false;
+    (async () => {
+      // let the environment map render first: materials compiled without it would recompile later
+      await nextFrame();
+      await nextFrame();
+      // in-world text (troika) lays out glyphs in a worker and only has its final material once that's done;
+      // wait for it (up to 6s), or the text shader compiles the first time a world with labels appears
+      const texts: { _textRenderInfo?: unknown; _isSyncing?: boolean }[] = [];
+      scene.traverse((o) => {
+        if ("_needsSync" in o && typeof (o as { sync?: unknown }).sync === "function") texts.push(o as never);
+      });
+      const until = performance.now() + 6000;
+      while (!cancelled && performance.now() < until && texts.some((t) => !t._textRenderInfo || t._isSyncing)) await nextFrame();
+      if (cancelled) return;
+      scene.traverse((o) => {
+        const mat = (o as Mesh).material as (Material & { map?: Texture | null; uniforms?: Record<string, { value: unknown }> }) | undefined;
+        if (!mat || Array.isArray(mat)) return;
+        const tex = mat.map ?? (mat.uniforms?.map?.value as Texture | undefined);
+        if (tex instanceof Texture) gl.initTexture(tex);
+      });
+      let compiling: Promise<unknown> = Promise.resolve();
+      withAllVisible(scene, () => (compiling = gl.compileAsync(scene, camera)));
+      await compiling;
+      if (cancelled) return;
+      // warm-up draws from every stop, in one task so no real frame interleaves; CameraRig restores the camera next frame
+      const s: CameraSample = { pos: new Vector3(), look: new Vector3(), bg: new Color(), fogNear: 10, fogFar: 100 };
+      const near = camera.near;
+      withAllVisible(scene, () => {
+        for (const k of journey.keys) {
+          journey.sample(journey.p(k.id), s);
+          camera.position.copy(s.pos);
+          camera.lookAt(s.look);
+          camera.updateMatrixWorld();
+          gl.render(scene, camera);
+        }
+      });
+      camera.near = near;
+      camera.updateProjectionMatrix();
+      await nextFrame();
+      if (!cancelled) setUI({ ready: true, loaded: 100 });
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [gl, scene, camera, journey]);
   return null;
 }
 
