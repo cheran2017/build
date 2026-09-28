@@ -208,8 +208,10 @@ function buildKeys(L: Layout): Key[] {
     // SCENE 1: white studio
     // desk sits right of centre on desktop so the headline has the left half
     // (phones aim low so the studio sits in the top third, above the headline)
-    k("r0", m([0.4, 1.55, 5.4], [0, 1.7, 6.2]), m([-0.55, 0.85, 0], [0, -0.8, 0]), 0, 1.2, S.studio, studioFog),
-    k("r1", m([1.9, 1.35, 3.4], [0.9, 1.45, 4.6]), [0, 0.88, 0], 1.6, 0.2, S.studio, studioFog),
+    // desktop: close enough that the desk fills the right half beside the headline (the look point sits left of it)
+    k("r0", m([0.5, 1.28, 3.1], [0, 1.7, 6.2]), m([-0.8, 0.8, 0], [0, -0.8, 0]), 0, 1.2, S.studio, studioFog),
+    // must stay closer than r0 on each layout, or the push-in toward the laptop runs backwards
+    k("r1", m([1.25, 1.18, 2.15], [0.9, 1.45, 4.6]), [0, 0.87, 0], 1.6, 0.2, S.studio, studioFog),
     k("r2", m([-0.45, 1.08, 1.25], [-0.2, 1.12, 1.7]), [0, 0.86, -0.1], 1.4, 0.4, S.studio, studioFog),
     // SCENE 2: laptop portal
     k("r3", onScreen(m(0.32, 0.5)), SCREEN.center.toArray() as V3, 1.2, 0.3, S.studio, studioFog),

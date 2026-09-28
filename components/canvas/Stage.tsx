@@ -4,7 +4,7 @@ import { Suspense, useContext, useEffect, useMemo } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Environment, Lightformer, useProgress, useTexture } from "@react-three/drei";
 import { Color, Fog, Material, MathUtils, Mesh, NeutralToneMapping, Object3D, PerspectiveCamera, Scene, Texture, Vector2, Vector3 } from "three";
-import type { CameraSample, Journey } from "@/lib/journey";
+import { LAPTOP, type CameraSample, type Journey } from "@/lib/journey";
 import { sceneTextures } from "@/lib/content";
 import { getUI, scroll, setUI } from "@/lib/store";
 import { layoutWord } from "@/lib/type";
@@ -150,7 +150,7 @@ function CameraRig({ journey }: { journey: Journey }) {
     };
   }, [scene, fog, bg]);
 
-  const framing = useFinaleFraming(journey, camera);
+  const framing = useFraming(journey, camera);
 
   useFrame((state, dt) => {
     journey.sample(scroll.progress, sample);
@@ -179,62 +179,135 @@ function CameraRig({ journey }: { journey: Journey }) {
   return null;
 }
 
+/** A shot framed against the HTML: keep `points` inside the free screen area `band` (NDC) while `weight` > 0. */
+type FramedShot = {
+  points: Vector3[];
+  weight: (progress: number) => number;
+  band: { left: number; right: number; top: number; bottom: number };
+  shiftX: boolean;
+  shiftY: boolean;
+  /** reads the free area from the page (px -> NDC); re-run on resize and when the overlays reflow */
+  measure: (W: number, H: number) => void;
+  watch: string[];
+};
+
+/** Offset of an element's layout box inside the fixed overlay layer (offsets ignore the fade-in transforms). */
+function boxOf(selector: string) {
+  const sec = document.querySelector<HTMLElement>(selector);
+  const inner = sec?.firstElementChild as HTMLElement | null;
+  if (!sec || !inner) return null;
+  const left = sec.offsetLeft + inner.offsetLeft;
+  const top = sec.offsetTop + inner.offsetTop;
+  return { left, top, right: left + inner.offsetWidth, bottom: top + inner.offsetHeight };
+}
+
+const pxToNdc = (x: number, y: number, W: number, H: number) => ({ x: (2 * x) / W - 1, y: 1 - (2 * y) / H });
+
 /**
- * Frames the final UTN wordmark in the space the HTML leaves free: below the nav, above the call to action.
- * The 3D shot is fixed but the HTML is sized by the viewport, so on a wide, short window the headline would
- * otherwise cover the word. During the finale this shifts the projection vertically (a lens shift: nothing in
- * the scene moves) and, only if the word can't fit, zooms out. Everywhere else it's the plain camera.
+ * Frames key shots in the space the HTML leaves free. The 3D shots are fixed but the HTML is sized by the
+ * viewport, so on some window shapes text would cover the subject or the subject would run off-screen.
+ * While a shot is active this zooms out (only if the subject can't fit) and shifts the lens (nothing in the
+ * scene moves) so the subject sits centred in its free area. Everywhere else it's the plain camera.
+ *   opening (desktop): the desk beside the hero headline, between it and the right edge
+ *   finale: the UTN wordmark below the nav and above the call to action
  */
-function useFinaleFraming(journey: Journey, camera: PerspectiveCamera) {
+function useFraming(journey: Journey, camera: PerspectiveCamera) {
   const baseFov = useMemo(() => camera.fov, [camera]);
-  const band = useMemo(() => ({ top: 0.8, bottom: 0 }), []);
-  const f = useMemo(() => {
-    const w = journey.layout.words.utn;
-    const lay = layoutWord(w.text, w.size, w.tracking);
-    const z = w.center[2] + w.depth;
-    const x0 = w.center[0] - lay.width / 2;
-    const x1 = w.center[0] + lay.width / 2;
-    const yTop = w.center[1] + lay.cap * 1.03;
-    const yBottom = w.center[1] - 1.5; // the accent underline sits 1.2 below the baseline
-    return {
-      corners: [new Vector3(x0, yTop, z), new Vector3(x1, yTop, z), new Vector3(x0, yBottom, z), new Vector3(x1, yBottom, z)],
-      from: journey.p("numbers"),
-      to: journey.p("final"),
-      v: new Vector3(),
+  const v = useMemo(() => new Vector3(), []);
+
+  const shots = useMemo<FramedShot[]>(() => {
+    const navBottom = () => {
+      const nav = document.querySelector<HTMLElement>(".chrome .nav");
+      return nav ? nav.offsetTop + nav.offsetHeight : 80;
     };
+    const list: FramedShot[] = [];
+
+    if (!journey.mobile) {
+      // desk slab corners, plinth foot, and the sphere's top
+      const pts: Vector3[] = [];
+      for (const x of [-0.95, 0.95]) for (const z of [-0.43, 0.43]) pts.push(new Vector3(x, LAPTOP.deskY + 0.005, z), new Vector3(x, LAPTOP.deskY - 0.055, z));
+      for (const x of [-0.03, 0.39]) for (const z of [-0.34, 0.24]) pts.push(new Vector3(x, 0, z));
+      pts.push(new Vector3(0.68, LAPTOP.deskY + 0.15, 0.16));
+      const hold = journey.p("r0:hold");
+      const leave = journey.p("r1", -0.4);
+      const band = { left: 0, right: 0.9, top: 0.7, bottom: -0.8 };
+      list.push({
+        points: pts,
+        weight: (p) => 1 - MathUtils.smootherstep(p, hold, leave),
+        band,
+        shiftX: true,
+        shiftY: false,
+        watch: ['[data-ov="hero"]'],
+        measure(W, H) {
+          const hero = boxOf('[data-ov="hero"]');
+          const chapters = document.querySelector<HTMLElement>(".chapters");
+          const a = pxToNdc((hero?.right ?? W * 0.4) + 32, navBottom() + 16, W, H);
+          const b = pxToNdc(W - 32, (chapters ? chapters.offsetTop : H - 70) - 12, W, H);
+          Object.assign(band, { left: a.x, top: a.y, right: b.x, bottom: b.y });
+        },
+      });
+    }
+
+    {
+      const w = journey.layout.words.utn;
+      const lay = layoutWord(w.text, w.size, w.tracking);
+      const z = w.center[2] + w.depth;
+      const x0 = w.center[0] - lay.width / 2;
+      const x1 = w.center[0] + lay.width / 2;
+      const yTop = w.center[1] + lay.cap * 1.03;
+      const yBottom = w.center[1] - 1.5; // the accent underline sits 1.2 below the baseline
+      const from = journey.p("numbers");
+      const to = journey.p("final");
+      const band = { left: -0.92, right: 0.92, top: 0.8, bottom: 0 };
+      list.push({
+        points: [new Vector3(x0, yTop, z), new Vector3(x1, yTop, z), new Vector3(x0, yBottom, z), new Vector3(x1, yBottom, z)],
+        weight: (p) => MathUtils.smootherstep(p, from, to),
+        band,
+        shiftX: false,
+        shiftY: true,
+        watch: ['[data-ov="final"]'],
+        measure(W, H) {
+          const cta = boxOf('[data-ov="final"]');
+          band.top = pxToNdc(0, navBottom() + 8, W, H).y;
+          band.bottom = pxToNdc(0, (cta?.top ?? H * 0.55) - 28, W, H).y;
+        },
+      });
+    }
+    return list;
   }, [journey]);
 
-  // measure the free band in NDC; the overlay's layout box (offsets ignore its fade-in transform)
   useEffect(() => {
-    const measure = () => {
-      const H = window.innerHeight;
-      const nav = document.querySelector<HTMLElement>(".chrome .nav");
-      const sec = document.querySelector<HTMLElement>('[data-ov="final"]');
-      const inner = sec?.firstElementChild as HTMLElement | null;
-      const navBottom = nav ? nav.offsetTop + nav.offsetHeight : 80;
-      const ctaTop = sec && inner ? sec.offsetTop + inner.offsetTop : H * 0.55;
-      band.top = 1 - (2 * (navBottom + 8)) / H;
-      band.bottom = 1 - (2 * (ctaTop - 28)) / H;
-    };
+    const measure = () => shots.forEach((s) => s.measure(window.innerWidth, window.innerHeight));
     measure();
     const ro = new ResizeObserver(measure);
-    const sec = document.querySelector('[data-ov="final"]');
-    if (sec) ro.observe(sec);
+    shots.flatMap((s) => s.watch).forEach((sel) => {
+      const el = document.querySelector(sel);
+      if (el) ro.observe(el);
+    });
     window.addEventListener("resize", measure);
     document.fonts?.ready.then(measure);
     return () => {
       ro.disconnect();
       window.removeEventListener("resize", measure);
     };
-  }, [band]);
+  }, [shots]);
 
   return {
     apply(progress: number, near: number) {
-      const k = MathUtils.smootherstep(progress, f.from, f.to);
+      let shot: FramedShot | null = null;
+      let k = 0;
+      for (const s of shots) {
+        const w = s.weight(progress);
+        if (w > k) {
+          k = w;
+          shot = s;
+        }
+      }
       let fov = baseFov;
-      let shift = 0;
-      if (k > 0) {
-        // where the word lands with the plain lens
+      let sx = 0;
+      let sy = 0;
+      if (shot && k > 0) {
+        // where the subject lands with the plain lens
         camera.fov = baseFov;
         camera.near = near;
         camera.updateProjectionMatrix();
@@ -242,29 +315,32 @@ function useFinaleFraming(journey: Journey, camera: PerspectiveCamera) {
         let bottom = Infinity;
         let left = Infinity;
         let right = -Infinity;
-        for (const c of f.corners) {
-          f.v.copy(c).project(camera);
-          top = Math.max(top, f.v.y);
-          bottom = Math.min(bottom, f.v.y);
-          left = Math.min(left, f.v.x);
-          right = Math.max(right, f.v.x);
+        for (const c of shot.points) {
+          v.copy(c).project(camera);
+          top = Math.max(top, v.y);
+          bottom = Math.min(bottom, v.y);
+          left = Math.min(left, v.x);
+          right = Math.max(right, v.x);
         }
-        const room = Math.max(0.2, band.top - band.bottom);
-        // zoom out only (never in), to fit the band's height and 92% of the width
-        const fit = Math.min(1, room / (top - bottom), 1.84 / (right - left));
+        const b = shot.band;
+        // zoom out only (never in), to fit the free area
+        const fit = Math.min(1, Math.max(0.2, b.top - b.bottom) / (top - bottom), Math.max(0.2, b.right - b.left) / (right - left));
         const s = 1 + (fit - 1) * k;
         fov = MathUtils.radToDeg(2 * Math.atan(Math.tan(MathUtils.degToRad(baseFov) / 2) / s));
-        // zooming scales NDC about the centre by s; then shift the word's centre onto the band's centre
-        shift = k * ((band.top + band.bottom) / 2 - (s * (top + bottom)) / 2);
+        // zooming scales NDC about the centre by s; then shift the subject's centre onto the free area's centre
+        if (shot.shiftX) sx = k * ((b.left + b.right) / 2 - (s * (left + right)) / 2);
+        if (shot.shiftY) sy = k * ((b.top + b.bottom) / 2 - (s * (top + bottom)) / 2);
       }
       // compare with the camera's real state: the measuring pass above and R3F's own resize handling
       // both rebuild the projection matrix, which drops the shift
-      if (camera.near === near && camera.fov === fov && camera.projectionMatrix.elements[9] === -shift && k === 0) return;
+      const P = camera.projectionMatrix.elements;
+      if (k === 0 && camera.near === near && camera.fov === fov && P[8] === -sx && P[9] === -sy) return;
       camera.near = near;
       camera.fov = fov;
       camera.updateProjectionMatrix();
-      // lens shift: ndc.y = ... - m23, so m23 = -shift moves everything up by `shift`
-      camera.projectionMatrix.elements[9] = -shift;
+      // lens shift: ndc = ... - m13 / - m23, so setting them to -shift moves everything by `shift`
+      P[8] = -sx;
+      P[9] = -sy;
       camera.projectionMatrixInverse.copy(camera.projectionMatrix).invert();
     },
   };
