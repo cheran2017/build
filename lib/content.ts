@@ -83,7 +83,7 @@ export const whoFor = [
 export const founder = {
   name: "Marcin",
   photo: "/media/scenes/founder.webp",
-  photoAlt: "The founder with fellow builders at Skool Games",
+  photoAlt: "The founder holding the startup achievement award",
   badge: "/media/scenes/skool-badge.webp",
   bio: "I help people with zero coding experience build their own software and break free from the 9 to 5. We don’t waste time. We build. We launch. We learn by doing.",
   socials: [
