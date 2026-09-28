@@ -386,6 +386,7 @@ export function Overlays({ journey: j }: { journey: Journey }) {
             key={d.id}
             ref={(el) => void (els.current[i] = el)}
             className={`ov ov-${d.place} theme-${d.theme}${d.card ? " ov-card" : ""}`}
+            data-ov={d.id}
             style={{ visibility: "hidden" }}
           >
             <div className="ov-inner" style={{ opacity: 0 }}>

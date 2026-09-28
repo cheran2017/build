@@ -7,6 +7,7 @@ import { Color, Fog, Material, MathUtils, Mesh, NeutralToneMapping, Object3D, Pe
 import type { CameraSample, Journey } from "@/lib/journey";
 import { sceneTextures } from "@/lib/content";
 import { getUI, scroll, setUI } from "@/lib/store";
+import { layoutWord } from "@/lib/type";
 import { JourneyContext } from "./parts";
 import { Studio } from "./Studio";
 import { Tunnel } from "./Tunnel";
@@ -149,6 +150,8 @@ function CameraRig({ journey }: { journey: Journey }) {
     };
   }, [scene, fog, bg]);
 
+  const framing = useFinaleFraming(journey, camera);
+
   useFrame((state, dt) => {
     journey.sample(scroll.progress, sample);
     camera.position.copy(sample.pos);
@@ -161,6 +164,7 @@ function CameraRig({ journey }: { journey: Journey }) {
       camera.rotateY(-pointer.x * 0.025);
       camera.rotateX(pointer.y * 0.018);
     }
+    camera.updateMatrixWorld();
 
     bg.copy(sample.bg);
     fog.color.copy(sample.bg);
@@ -169,13 +173,101 @@ function CameraRig({ journey }: { journey: Journey }) {
 
     // tight near plane only while inside the studio (laptop close-ups), then a deeper one for the giant worlds
     const near = scroll.progress < nearSwitch ? 0.01 : 0.4;
-    if (camera.near !== near) {
-      camera.near = near;
-      camera.updateProjectionMatrix();
-    }
+    framing.apply(scroll.progress, near);
   }, -1);
 
   return null;
+}
+
+/**
+ * Frames the final UTN wordmark in the space the HTML leaves free: below the nav, above the call to action.
+ * The 3D shot is fixed but the HTML is sized by the viewport, so on a wide, short window the headline would
+ * otherwise cover the word. During the finale this shifts the projection vertically (a lens shift: nothing in
+ * the scene moves) and, only if the word can't fit, zooms out. Everywhere else it's the plain camera.
+ */
+function useFinaleFraming(journey: Journey, camera: PerspectiveCamera) {
+  const baseFov = useMemo(() => camera.fov, [camera]);
+  const band = useMemo(() => ({ top: 0.8, bottom: 0 }), []);
+  const f = useMemo(() => {
+    const w = journey.layout.words.utn;
+    const lay = layoutWord(w.text, w.size, w.tracking);
+    const z = w.center[2] + w.depth;
+    const x0 = w.center[0] - lay.width / 2;
+    const x1 = w.center[0] + lay.width / 2;
+    const yTop = w.center[1] + lay.cap * 1.03;
+    const yBottom = w.center[1] - 1.5; // the accent underline sits 1.2 below the baseline
+    return {
+      corners: [new Vector3(x0, yTop, z), new Vector3(x1, yTop, z), new Vector3(x0, yBottom, z), new Vector3(x1, yBottom, z)],
+      from: journey.p("numbers"),
+      to: journey.p("final"),
+      v: new Vector3(),
+    };
+  }, [journey]);
+
+  // measure the free band in NDC; the overlay's layout box (offsets ignore its fade-in transform)
+  useEffect(() => {
+    const measure = () => {
+      const H = window.innerHeight;
+      const nav = document.querySelector<HTMLElement>(".chrome .nav");
+      const sec = document.querySelector<HTMLElement>('[data-ov="final"]');
+      const inner = sec?.firstElementChild as HTMLElement | null;
+      const navBottom = nav ? nav.offsetTop + nav.offsetHeight : 80;
+      const ctaTop = sec && inner ? sec.offsetTop + inner.offsetTop : H * 0.55;
+      band.top = 1 - (2 * (navBottom + 8)) / H;
+      band.bottom = 1 - (2 * (ctaTop - 28)) / H;
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    const sec = document.querySelector('[data-ov="final"]');
+    if (sec) ro.observe(sec);
+    window.addEventListener("resize", measure);
+    document.fonts?.ready.then(measure);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", measure);
+    };
+  }, [band]);
+
+  return {
+    apply(progress: number, near: number) {
+      const k = MathUtils.smootherstep(progress, f.from, f.to);
+      let fov = baseFov;
+      let shift = 0;
+      if (k > 0) {
+        // where the word lands with the plain lens
+        camera.fov = baseFov;
+        camera.near = near;
+        camera.updateProjectionMatrix();
+        let top = -Infinity;
+        let bottom = Infinity;
+        let left = Infinity;
+        let right = -Infinity;
+        for (const c of f.corners) {
+          f.v.copy(c).project(camera);
+          top = Math.max(top, f.v.y);
+          bottom = Math.min(bottom, f.v.y);
+          left = Math.min(left, f.v.x);
+          right = Math.max(right, f.v.x);
+        }
+        const room = Math.max(0.2, band.top - band.bottom);
+        // zoom out only (never in), to fit the band's height and 92% of the width
+        const fit = Math.min(1, room / (top - bottom), 1.84 / (right - left));
+        const s = 1 + (fit - 1) * k;
+        fov = MathUtils.radToDeg(2 * Math.atan(Math.tan(MathUtils.degToRad(baseFov) / 2) / s));
+        // zooming scales NDC about the centre by s; then shift the word's centre onto the band's centre
+        shift = k * ((band.top + band.bottom) / 2 - (s * (top + bottom)) / 2);
+      }
+      // compare with the camera's real state: the measuring pass above and R3F's own resize handling
+      // both rebuild the projection matrix, which drops the shift
+      if (camera.near === near && camera.fov === fov && camera.projectionMatrix.elements[9] === -shift && k === 0) return;
+      camera.near = near;
+      camera.fov = fov;
+      camera.updateProjectionMatrix();
+      // lens shift: ndc.y = ... - m23, so m23 = -shift moves everything up by `shift`
+      camera.projectionMatrix.elements[9] = -shift;
+      camera.projectionMatrixInverse.copy(camera.projectionMatrix).invert();
+    },
+  };
 }
 
 const nextFrame = () => new Promise<void>((r) => requestAnimationFrame(() => r()));
