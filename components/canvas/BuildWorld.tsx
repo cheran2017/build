@@ -66,13 +66,13 @@ export function BuildWorld() {
       ))}
 
       <Word3D
-        spec={{ text: "21", size: B.days.sizeNum, depth: 2.2, tracking: -0.02, center: [B.days.center[0] - gap, B.days.center[1], B.days.center[2]] }}
+        spec={{ text: "3", size: B.days.sizeNum, depth: 2.2, tracking: -0.02, center: [B.days.center[0] - gap, B.days.center[1], B.days.center[2]] }}
         material={metal}
         align="right"
         letters={dayNum}
       />
       <Word3D
-        spec={{ text: "DAYS", size: B.days.sizeWord, depth: 1.4, tracking: 0.02, center: [B.days.center[0] + gap, B.days.center[1], B.days.center[2]] }}
+        spec={{ text: "PHASES", size: B.days.sizeWord, depth: 1.4, tracking: 0.02, center: [B.days.center[0] + gap, B.days.center[1], B.days.center[2]] }}
         material={metal}
         align="left"
         letters={dayWord}

@@ -1,27 +1,31 @@
 "use client";
 
 import {
+  about,
   brand,
+  chapterCards,
   communityCollage,
   coachingCall,
   creatorBadges,
   founder,
   framework,
   hero,
+  industriesCard,
   launches,
   membersMap,
+  phasesCard,
   proofQuote,
-  stats,
+  solutionsCard,
   stories,
+  storiesCard,
+  teamCard,
   whoFor,
 } from "@/lib/content";
-import { createContext, useContext } from "react";
-import { JoinSection, VideoModal } from "./Chrome";
-import { JoinButton } from "./Buttons";
+import { useContext } from "react";
+import { JoinSection, TextOnly, VideoModal } from "./Chrome";
+import { JoinButton, Logo } from "./Buttons";
 
 /* eslint-disable @next/next/no-img-element */
-
-const TextOnly = createContext(false);
 
 function Img(props: React.ImgHTMLAttributes<HTMLImageElement>) {
   return useContext(TextOnly) ? null : <img {...props} />;
@@ -37,8 +41,8 @@ export function ClassicView({ textOnly = false }: { textOnly?: boolean }) {
     <TextOnly.Provider value={textOnly}>
     <div className="classic">
       <header className="nav nav-static">
-        <a href="#top" className="wordmark">
-          {brand.name}
+        <a href="#top" className="wordmark" aria-label={`${brand.name} home`}>
+          <Logo />
         </a>
         <JoinButton small />
       </header>
@@ -63,19 +67,19 @@ export function ClassicView({ textOnly = false }: { textOnly?: boolean }) {
         </section>
 
         <section className="c-section">
-          <p className="eyebrow">01 · Idea</p>
-          <h2 className="section-title">Real apps. Built by people who never wrote code.</h2>
-          <p className="lede">{brand.name} is where beginners, creators and founders build and launch real products with AI and no code tools.</p>
+          <p className="eyebrow">01 · {chapterCards.idea.word}</p>
+          <h2 className="section-title">{about.headline}</h2>
+          <p className="lede">{about.lede}</p>
           <ul className="ticks">
             {whoFor.map((w) => (
               <li key={w}>{w}</li>
             ))}
           </ul>
-          <Img className="c-wide" src={communityCollage} alt="Creators who have shared members' work" loading="lazy" />
+          <Img className="c-wide" src={communityCollage} alt="" loading="lazy" />
           <div className="c-founder">
             <Img src={founder.photo} alt={founder.photoAlt} loading="lazy" />
             <div>
-              <h3 className="headline">Hey, I’m {founder.name}.</h3>
+              <h3 className="headline">{founder.headline}</h3>
               <p className="lede">{founder.bio}</p>
               <ul className="stats">
                 {founder.socials.map((s) => (
@@ -90,8 +94,8 @@ export function ClassicView({ textOnly = false }: { textOnly?: boolean }) {
         </section>
 
         <section className="c-section c-dark">
-          <p className="eyebrow">02 · Build</p>
-          <h2 className="section-title">One path. Three parts. Idea to launch in {stats.days} days.</h2>
+          <p className="eyebrow">02 · {chapterCards.build.word}</p>
+          <h2 className="section-title">{phasesCard.headline}</h2>
           <div className="c-grid3">
             {framework.map((f) => (
               <article key={f.n} className="c-card">
@@ -104,22 +108,21 @@ export function ClassicView({ textOnly = false }: { textOnly?: boolean }) {
               </article>
             ))}
           </div>
-          <Img className="c-wide" src={coachingCall} alt="A weekly live coaching call with members" loading="lazy" />
-          <p className="lede center">Weekly live coaching and co building. Nothing prerecorded.</p>
-          <h3 className="headline center">
-            {stats.projects} live apps built inside {brand.name}.
-          </h3>
+          <Img className="c-wide" src={coachingCall} alt="" loading="lazy" />
+          <p className="lede center">{teamCard.headline}</p>
+          <h3 className="headline center">{solutionsCard.headline}</h3>
           <div className="c-gallery">
             {launches.map((l) => (
               <Img key={l.src} src={l.src} alt={l.title} loading="lazy" />
             ))}
           </div>
-          <Img className="c-wide" src={membersMap} alt="Where members build from around the world" loading="lazy" />
+          <p className="lede center">{industriesCard.lede}</p>
+          <Img className="c-wide" src={membersMap} alt="" loading="lazy" />
         </section>
 
         <section className="c-section">
-          <p className="eyebrow">03 · Launch</p>
-          <h2 className="section-title">Real apps. Real builders. Real results.</h2>
+          <p className="eyebrow">03 · {chapterCards.scale.word}</p>
+          <h2 className="section-title">{storiesCard.headline}</h2>
           <div className="c-stories">
             {stories.map((s) => (
               <article key={s.id} className="c-story">
@@ -127,7 +130,7 @@ export function ClassicView({ textOnly = false }: { textOnly?: boolean }) {
                 <span className="c-stat-label">{s.statLabel}</span>
                 <p className="c-quote">“{s.quote}”</p>
                 <p className="c-detail">
-                  {s.name} · {s.detail}
+                  {s.name}, {s.byline} · {s.detail}
                 </p>
               </article>
             ))}

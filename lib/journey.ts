@@ -1,4 +1,5 @@
 import { CatmullRomCurve3, Color, MathUtils, SRGBColorSpace, Vector3, type RGB } from "three";
+import { leadership } from "./content";
 import { counterOf, layoutWord } from "./type";
 
 export type V3 = [number, number, number];
@@ -49,6 +50,14 @@ const onScreen = (d: number): V3 => SCREEN.center.clone().addScaledVector(SCREEN
 /* Layout: where everything sits in the world                          */
 /* ------------------------------------------------------------------ */
 
+/**
+ * The leadership stop walks through every leader at one spot: leader k is centred LEADER_LEAD + k * LEADER_STEP beats after
+ * arriving, then the strip slides to the next one over the second half of the step. Overlays and the 3D strip share these.
+ */
+export const LEADER_STEP = 2.2;
+export const LEADER_LEAD = 0.35;
+const LEADER_HOLD = LEADER_LEAD + (leadership.leaders.length - 1) * LEADER_STEP + 0.7;
+
 export type Spot = { focus: V3; from: V3; look: V3; rotY: number; side: OverlaySide };
 
 export type WordSpec = { text: string; size: number; depth: number; tracking: number; center: V3 };
@@ -95,8 +104,9 @@ export function getLayout(mobile: boolean) {
   const words = {
     idea: { text: "IDEA", size: m(34, 21), depth: m(5, 4), tracking: -0.02, center: [0, 0, -252.5] as V3 },
     build: { text: "BUILD", size: m(20, 11), depth: 4, tracking: -0.01, center: [0, 0, -340] as V3 },
-    launch: { text: "LAUNCH", size: m(16, 8.5), depth: 3.2, tracking: -0.01, center: [0, 0, -706] as V3 },
-    utn: { text: "UTN", size: m(20, 12), depth: 3, tracking: 0.02, center: [0, 6, -1040] as V3 },
+    launch: { text: "SCALE", size: m(16, 8.5), depth: 3.2, tracking: -0.01, center: [0, 0, -706] as V3 },
+    // brand wordmark (key kept as `utn` for the camera/stage code): six letters, so smaller than the old three-letter mark
+    utn: { text: "METAYB", size: m(11, 6.5), depth: 3, tracking: 0.02, center: [0, 6, -1040] as V3 },
   } satisfies Record<string, WordSpec>;
 
   const dCounter = counterWorld(words.idea, 1);
@@ -122,7 +132,7 @@ export function getLayout(mobile: boolean) {
         spot([-1, 21, -432], [1.5, -11, 28], "left", 2.4),
       ],
       // gap between "21" and "DAYS" is the camera's route to the coaching monitor, so keep it wide
-      days: { center: [0, 4, -480] as V3, sizeNum: m(13, 8), sizeWord: m(5.2, 3.4), gap: m(4.5, 2.8) },
+      days: { center: [0, 4, -480] as V3, sizeNum: m(13, 8), sizeWord: m(4, 2.6), gap: m(4.5, 2.8) },
       // on the right, so after "21 DAYS" the camera turns over the low DAYS word, not past the tall 21
       coach: spot([13.5, 9, -510], [-12.5, 0, 19], "left", 4.3),
       coachW: m(16, 10),
@@ -142,9 +152,9 @@ export function getLayout(mobile: boolean) {
         spot([11, 7, -872], [-9, 0.5, 21], "left", 4.2),
       ],
       numbers: [
-        { text: "500+", label: "BUILDERS", pos: [m(-21, -7), 2.5, -938] as V3, rotY: m(0.4, 0.2), size: m(6, 3.6) },
-        { text: "275+", label: "LIVE APPS", pos: [m(21, 7), 5, -948] as V3, rotY: m(-0.4, -0.2), size: m(6, 3.6) },
-        { text: "21", label: "DAYS", pos: [0, m(18, 16), -962] as V3, rotY: 0, size: m(6, 4) },
+        { text: "500+", label: "STRONG TEAM", pos: [m(-21, -7), 2.5, -938] as V3, rotY: m(0.4, 0.2), size: m(6, 3.6) },
+        { text: "20+", label: "BRANDS SERVED", pos: [m(21, 7), 5, -948] as V3, rotY: m(-0.4, -0.2), size: m(6, 3.6) },
+        { text: "12+", label: "COUNTRIES", pos: [0, m(18, 16), -962] as V3, rotY: 0, size: m(6, 4) },
       ],
     },
     finale: {
@@ -224,7 +234,7 @@ function buildKeys(L: Layout): Key[] {
     at("i1", I.i1, S.idea, ideaFog),
     at("i2", I.i2, S.idea, ideaFog),
     at("i3", I.i3, S.idea, ideaFog),
-    at("i4", I.i4, S.idea, ideaFog),
+    at("i4", I.i4, S.idea, ideaFog, 1.4, LEADER_HOLD),
     k("i5", [cx, cy, m(-212, -200)], [cx, cy, -252], 1.4, 0.8, S.idea, ideaFog),
     // light flips to dark while the camera is inside the D's counter
     k("dThrough", [cx, cy, -262], [cx, cy - 0.5, -300], 1.2, 0, S.build, darkFog, [0.55, 0.9]),
@@ -257,8 +267,8 @@ function buildKeys(L: Layout): Key[] {
 export const CHAPTERS = [
   { id: "idea", label: "Idea", stop: "idea" },
   { id: "build", label: "Build", stop: "build" },
-  { id: "launch", label: "Launch", stop: "launch" },
-  { id: "join", label: "Join", stop: "final" },
+  { id: "launch", label: "Scale", stop: "launch" },
+  { id: "join", label: "Contact", stop: "final" },
 ] as const;
 
 /* ------------------------------------------------------------------ */

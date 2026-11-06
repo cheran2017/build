@@ -508,6 +508,32 @@ a {
   letter-spacing: 0.14em;
   text-decoration: none;
   color: inherit;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Metayb logo: blue wordmark, swapped for the white one on dark chrome */
+.logo {
+  display: inline-flex;
+  align-items: center;
+}
+
+.logo img {
+  display: block;
+  height: 26px;
+  width: auto;
+}
+
+.logo .logo-white {
+  display: none;
+}
+
+.chrome[data-theme="dark"] .logo .logo-blue {
+  display: none;
+}
+
+.chrome[data-theme="dark"] .logo .logo-white {
+  display: block;
 }
 
 /* glass pills keep the chrome legible over any world, light or dark */
@@ -609,10 +635,8 @@ a {
   pointer-events: none;
 }
 
-.loader-mark {
-  font: 800 clamp(48px, 8vw, 88px) / 1 var(--display);
-  letter-spacing: 0.14em;
-  margin-right: -0.14em;
+.loader-mark img {
+  height: clamp(44px, 7vw, 80px);
 }
 
 .loader-bar {
@@ -707,6 +731,73 @@ a {
   position: relative;
   z-index: 10;
   background: var(--paper);
+}
+
+.stats + .btn {
+  margin-top: 20px;
+}
+
+.leaders {
+  padding: clamp(96px, 14vh, 160px) var(--gutter) 0;
+}
+
+.leaders-inner {
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.leaders-inner .lede {
+  max-width: 640px;
+  margin: 18px auto 0;
+}
+
+.leader-grid {
+  list-style: none;
+  margin: 56px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.leader {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  padding: 0 0 22px;
+  border-radius: var(--radius);
+  background: var(--white);
+  border: 1px solid rgba(17, 18, 22, 0.08);
+  overflow: hidden;
+}
+
+.leader img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 286 / 197;
+  object-fit: cover;
+  object-position: center top;
+  margin-bottom: 14px;
+}
+
+.leader h3 {
+  font: 800 19px/1.2 var(--display);
+  letter-spacing: -0.01em;
+  padding: 0 20px;
+}
+
+.leader-role {
+  font: 700 12px/1.4 var(--body);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+  padding: 0 20px;
+}
+
+.leader-bio {
+  font: 400 14px/1.55 var(--body);
+  color: var(--ink-2);
+  padding: 4px 20px 0;
 }
 
 .plans {
@@ -1115,6 +1206,11 @@ a {
 
   .chapter-track {
     width: 48px;
+  }
+
+  .leader-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
   }
 
   .plan-grid,

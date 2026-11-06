@@ -1,4 +1,4 @@
-import { brand, links } from "@/lib/content";
+import { brand, finale, links } from "@/lib/content";
 
 // Shared by the immersive overlays, the join section and the classic view.
 // Keep this file free of three / journey imports so the classic view never loads WebGL code.
@@ -11,7 +11,19 @@ export function Arrow() {
   );
 }
 
-export function JoinButton({ label = `Join ${brand.name}`, small }: { label?: string; small?: boolean }) {
+/** The Metayb logo. Both colourways are rendered; CSS shows the blue one, or the white one on dark chrome. */
+export function Logo({ className = "" }: { className?: string }) {
+  return (
+    <span className={`logo ${className}`.trim()}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img className="logo-blue" src={brand.logo} alt={brand.name} />
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img className="logo-white" src={brand.logoWhite} alt="" aria-hidden="true" />
+    </span>
+  );
+}
+
+export function JoinButton({ label = finale.primary, small }: { label?: string; small?: boolean }) {
   return (
     <a className={`btn btn-primary${small ? " btn-sm" : ""}`} href={links.join}>
       <span>{label}</span>

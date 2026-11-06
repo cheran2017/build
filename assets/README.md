@@ -1,6 +1,6 @@
-# UTN assets — drop your files here
+# Metayb assets (composed from metayb.ai by scripts/compose-metayb-assets.mjs; drop your own files here to replace them)
 
-Put UTN's own images and videos in this folder using the paths below, then run:
+Put Metayb's own images and videos in this folder using the paths below, then run:
 
 ```bash
 npm run media          # converts to WebP (max 1600px), copies videos, updates lib/media.json

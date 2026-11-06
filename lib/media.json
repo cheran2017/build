@@ -15,141 +15,233 @@
     1400,
     790
   ],
-  "/media/creators/creator-01.webp": [
-    1521,
-    306
+  "/media/creators/stat-01.webp": [
+    1000,
+    200
   ],
-  "/media/creators/creator-02.webp": [
-    1521,
-    306
+  "/media/creators/stat-02.webp": [
+    1000,
+    200
   ],
-  "/media/creators/creator-03.webp": [
-    1521,
-    306
+  "/media/creators/stat-03.webp": [
+    1000,
+    200
   ],
-  "/media/creators/creator-04.webp": [
-    1521,
-    306
+  "/media/creators/stat-04.webp": [
+    1000,
+    200
   ],
-  "/media/creators/creator-05.webp": [
-    1521,
-    306
+  "/media/creators/stat-05.webp": [
+    1000,
+    200
   ],
-  "/media/creators/creator-06.webp": [
-    1521,
-    306
+  "/media/creators/stat-06.webp": [
+    1000,
+    200
   ],
   "/media/framework/marketing.webp": [
     239,
     239
   ],
   "/media/framework/part-1-idea.webp": [
-    239,
-    239
+    560,
+    560
   ],
   "/media/framework/part-2-build.webp": [
-    239,
-    239
+    560,
+    560
   ],
   "/media/framework/part-3-launch.webp": [
-    239,
-    239
+    560,
+    560
   ],
-  "/media/gallery/launch-01.webp": [
-    1512,
-    1116
+  "/media/gallery/solution-01.webp": [
+    802,
+    583
   ],
-  "/media/gallery/launch-02.webp": [
-    672,
-    597
+  "/media/gallery/solution-02.webp": [
+    808,
+    578
   ],
-  "/media/gallery/launch-03.webp": [
-    764,
-    419
+  "/media/gallery/solution-03.webp": [
+    773,
+    549
   ],
-  "/media/gallery/launch-04.webp": [
-    760,
-    266
+  "/media/gallery/solution-04.webp": [
+    792,
+    576
   ],
-  "/media/gallery/launch-05.webp": [
-    772,
-    503
+  "/media/gallery/solution-05.webp": [
+    810,
+    595
   ],
-  "/media/gallery/launch-06.webp": [
-    780,
-    520
+  "/media/gallery/solution-06.webp": [
+    453,
+    305
   ],
-  "/media/gallery/launch-07.webp": [
-    1508,
-    1382
+  "/media/gallery/solution-07.webp": [
+    530,
+    361
   ],
-  "/media/gallery/launch-08.webp": [
-    1544,
-    948
+  "/media/gallery/solution-08.webp": [
+    471,
+    385
   ],
-  "/media/gallery/launch-09.webp": [
-    762,
-    406
+  "/media/gallery/solution-09.webp": [
+    477,
+    336
   ],
-  "/media/gallery/launch-10.webp": [
-    780,
-    435
+  "/media/gallery/solution-10.webp": [
+    559,
+    303
   ],
-  "/media/gallery/launch-11.webp": [
-    551,
-    348
+  "/media/gallery/solution-11.webp": [
+    546,
+    329
   ],
-  "/media/gallery/launch-12.webp": [
-    777,
-    563
+  "/media/gallery/solution-12.webp": [
+    534,
+    356
   ],
-  "/media/gallery/launch-13.webp": [
-    781,
-    567
+  "/media/gallery/solution-13.webp": [
+    482,
+    386
   ],
-  "/media/gallery/launch-14.webp": [
-    770,
-    408
+  "/media/gallery/solution-14.webp": [
+    588,
+    347
   ],
-  "/media/gallery/launch-15.webp": [
-    551,
-    515
+  "/media/gallery/solution-15.webp": [
+    562,
+    305
   ],
-  "/media/gallery/launch-16.webp": [
-    554,
-    461
+  "/media/gallery/solution-16.webp": [
+    1400,
+    832
   ],
-  "/media/gallery/launch-17.webp": [
-    751,
-    516
+  "/media/leaders/amit-todi.webp": [
+    572,
+    394
+  ],
+  "/media/leaders/badge-amit-todi.webp": [
+    1200,
+    300
+  ],
+  "/media/leaders/badge-manish-kumar.webp": [
+    1200,
+    300
+  ],
+  "/media/leaders/badge-narendra-anant-patil.webp": [
+    1200,
+    300
+  ],
+  "/media/leaders/badge-pradeep-manoharan.webp": [
+    1200,
+    300
+  ],
+  "/media/leaders/badge-rameshbabu.webp": [
+    1200,
+    300
+  ],
+  "/media/leaders/badge-sanjay-kumar.webp": [
+    1200,
+    300
+  ],
+  "/media/leaders/badge-shantham-sood.webp": [
+    1200,
+    300
+  ],
+  "/media/leaders/badge-shweta-todi.webp": [
+    1200,
+    300
+  ],
+  "/media/leaders/badge-sunitha-hattangadi.webp": [
+    1200,
+    300
+  ],
+  "/media/leaders/badge-suresh-kumar.webp": [
+    1200,
+    300
+  ],
+  "/media/leaders/badge-varun-selvan.webp": [
+    1200,
+    300
+  ],
+  "/media/leaders/badge-vikash-parmanandka.webp": [
+    1200,
+    300
+  ],
+  "/media/leaders/manish-kumar.webp": [
+    572,
+    394
+  ],
+  "/media/leaders/narendra-anant-patil.webp": [
+    572,
+    394
+  ],
+  "/media/leaders/pradeep-manoharan.webp": [
+    572,
+    394
+  ],
+  "/media/leaders/rameshbabu.webp": [
+    572,
+    394
+  ],
+  "/media/leaders/sanjay-kumar.webp": [
+    572,
+    394
+  ],
+  "/media/leaders/shantham-sood.webp": [
+    572,
+    394
+  ],
+  "/media/leaders/shweta-todi.webp": [
+    572,
+    394
+  ],
+  "/media/leaders/sunitha-hattangadi.webp": [
+    572,
+    394
+  ],
+  "/media/leaders/suresh-kumar.webp": [
+    572,
+    394
+  ],
+  "/media/leaders/varun-selvan.webp": [
+    572,
+    394
+  ],
+  "/media/leaders/vikash-parmanandka.webp": [
+    572,
+    394
   ],
   "/media/scenes/builders-faces.webp": [
     1200,
-    618
+    900
   ],
   "/media/scenes/coaching-call.webp": [
     1600,
-    923
+    1067
   ],
   "/media/scenes/community-collage.webp": [
-    1400,
-    790
+    1600,
+    600
   ],
   "/media/scenes/founder.webp": [
-    896,
-    1200
+    858,
+    591
   ],
   "/media/scenes/icon-idea.webp": [
-    239,
-    239
+    512,
+    512
   ],
   "/media/scenes/members-map.webp": [
     1600,
-    1162
+    900
   ],
   "/media/scenes/skool-badge.webp": [
     1200,
-    243
+    300
   ],
   "/media/wins/win-01.webp": [
     1600,

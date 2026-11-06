@@ -2,10 +2,27 @@
 
 import { useEffect, useMemo, useRef, type ReactNode } from "react";
 import { gsap } from "gsap";
-import { brand, founder, framework, hero, proofQuote, stats, stories, whoFor } from "@/lib/content";
-import { CHAPTERS, windowed, type Journey, type OverlaySide } from "@/lib/journey";
+import {
+  about,
+  brand,
+  chapterCards,
+  finale,
+  founder,
+  framework,
+  hero,
+  industriesCard,
+  leadership,
+  phasesCard,
+  proofQuote,
+  solutionsCard,
+  stories,
+  storiesCard,
+  teamCard,
+  whoFor,
+} from "@/lib/content";
+import { CHAPTERS, LEADER_LEAD, LEADER_STEP, windowed, type Journey, type OverlaySide } from "@/lib/journey";
 import { openVideo, scroll } from "@/lib/store";
-import { JoinButton } from "./Buttons";
+import { JoinButton, Logo } from "./Buttons";
 
 type Place = OverlaySide | "center" | "top";
 type OverlayDef = {
@@ -32,11 +49,11 @@ function Chapter({ n, word, line }: { n: string; word: string; line: string }) {
 
 function PlayButton({ name, video, poster }: { name: string; video: string | null; poster: string | null }) {
   return (
-    <button type="button" className="btn btn-ghost btn-sm play" onClick={() => openVideo({ title: `${name}’s story`, video, poster })}>
+    <button type="button" className="btn btn-ghost btn-sm play" onClick={() => openVideo({ title: name, video, poster })}>
       <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true">
         <path d="M7 4.5v15l12.5-7.5L7 4.5z" fill="currentColor" />
       </svg>
-      <span>{video ? `Watch ${name}’s story` : `See ${name}’s launch`}</span>
+      <span>{video ? `Watch the ${name} video` : `${storiesCard.more} ${name}`}</span>
     </button>
   );
 }
@@ -75,7 +92,7 @@ function buildOverlays(j: Journey): OverlayDef[] {
     // appears as the screen washes to white, dark ink on the glow
     { id: "enter", from: ["cross", -0.4], to: ["cross", -0.12], place: "center", theme: "light", body: <p className="big-line">{hero.enter}</p> },
 
-    { id: "ch-idea", from: ["idea", -0.35], to: ["idea:hold", 0.05], place: "bottom", theme: "light", body: <Chapter n="01" word="Idea" line="Every launch starts here." /> },
+    { id: "ch-idea", from: ["idea", -0.35], to: ["idea:hold", 0.05], place: "bottom", theme: "light", body: <Chapter n="01" word={chapterCards.idea.word} line={chapterCards.idea.line} /> },
     {
       id: "i1",
       from: ["i1", -0.3],
@@ -85,9 +102,9 @@ function buildOverlays(j: Journey): OverlayDef[] {
       card: true,
       body: (
         <>
-          <p className="eyebrow">What {brand.name} is</p>
-          <h2 className="headline">Real apps. Built by people who never wrote code.</h2>
-          <p className="lede">{brand.name} is where beginners, creators and founders build and launch real products with AI and no code tools.</p>
+          <p className="eyebrow">{about.eyebrow}</p>
+          <h2 className="headline">{about.headline}</h2>
+          <p className="lede">{about.lede}</p>
         </>
       ),
     },
@@ -100,8 +117,8 @@ function buildOverlays(j: Journey): OverlayDef[] {
       card: true,
       body: (
         <>
-          <p className="eyebrow">Who it’s for</p>
-          <h2 className="headline">You bring the idea. AI does the heavy lifting.</h2>
+          <p className="eyebrow">{about.whoEyebrow}</p>
+          <h2 className="headline">{about.whoHeadline}</h2>
           <ul className="ticks">
             {whoFor.map((w) => (
               <li key={w}>{w}</li>
@@ -119,35 +136,42 @@ function buildOverlays(j: Journey): OverlayDef[] {
       card: true,
       body: (
         <>
-          <p className="eyebrow">Social proof</p>
-          <h2 className="headline">People are talking about what gets built here.</h2>
-          <p className="lede">Creators with over {stats.followers} combined followers have shared what our members are building.</p>
+          <p className="eyebrow">{about.clientsEyebrow}</p>
+          <h2 className="headline">{about.clientsHeadline}</h2>
+          <p className="lede">{about.clientsLede}</p>
         </>
       ),
     },
-    {
-      id: "i4",
-      from: ["i4", -0.3],
-      to: ["i4:hold", 0.1],
-      place: I.i4.side,
-      theme: "light",
-      card: true,
-      body: (
-        <>
-          <p className="eyebrow">Meet the founder</p>
-          <h2 className="headline">Hey, I’m {founder.name}.</h2>
-          <p className="lede">{founder.bio}</p>
-          <ul className="stats">
-            {founder.socials.map((s) => (
-              <li key={s.label}>
-                <strong>{s.value}</strong>
-                <span>{s.label}</span>
-              </li>
-            ))}
-          </ul>
-        </>
-      ),
-    },
+    // one card per leader, in the site's order; the 3D strip slides to the next portrait between cards
+    ...leadership.leaders.map((l, k): OverlayDef => {
+      const c = LEADER_LEAD + k * LEADER_STEP;
+      const last = k === leadership.leaders.length - 1;
+      return {
+        id: `leader-${k}`,
+        from: ["i4", c],
+        to: ["i4", c + 0.4 * LEADER_STEP],
+        place: I.i4.side,
+        theme: "light",
+        card: true,
+        interactive: last,
+        body: (
+          <>
+            <p className="eyebrow">
+              {leadership.eyebrow} · {k + 1} of {leadership.leaders.length}
+            </p>
+            <h2 className="headline">{l.name}</h2>
+            <p className="lede">
+              <strong>{l.role}.</strong> {l.bio}
+            </p>
+            {last && (
+              <a className="btn btn-ghost btn-sm" href="#leadership">
+                {founder.cta}
+              </a>
+            )}
+          </>
+        ),
+      };
+    }),
     {
       id: "i5",
       from: ["i5", -0.25],
@@ -157,14 +181,14 @@ function buildOverlays(j: Journey): OverlayDef[] {
       card: true,
       body: (
         <h2 className="headline center">
-          The biggest mistake isn’t picking the wrong idea.
+          {about.mistakeLine}
           <br />
-          <span className="muted">It’s not building anything at all.</span>
+          <span className="muted">{about.mistakeMuted}</span>
         </h2>
       ),
     },
 
-    { id: "ch-build", from: ["build", -0.3], to: ["build:hold", 0], place: "bottom", theme: "dark", body: <Chapter n="02" word="Build" line="Welcome to the engine room." /> },
+    { id: "ch-build", from: ["build", -0.3], to: ["build:hold", 0], place: "bottom", theme: "dark", body: <Chapter n="02" word={chapterCards.build.word} line={chapterCards.build.line} /> },
     ...framework.map(
       (f, i): OverlayDef => ({
         id: `p${i + 1}`,
@@ -175,7 +199,7 @@ function buildOverlays(j: Journey): OverlayDef[] {
         card: true,
         body: (
           <>
-            <p className="eyebrow">The framework · Part {i + 1} of 3</p>
+            <p className="eyebrow">Capabilities · {i + 1} of {framework.length}</p>
             <h2 className="headline">{f.title}</h2>
             <p className="lede">
               <strong>{f.short}</strong> {f.body}
@@ -193,8 +217,8 @@ function buildOverlays(j: Journey): OverlayDef[] {
       card: true,
       body: (
         <>
-          <h2 className="headline center">Idea to launched product in {stats.days} days.</h2>
-          <p className="lede center">One hour a day, max. Move at your own pace. The goal is the finish line.</p>
+          <h2 className="headline center">{phasesCard.headline}</h2>
+          <p className="lede center">{phasesCard.lede}</p>
         </>
       ),
     },
@@ -207,9 +231,9 @@ function buildOverlays(j: Journey): OverlayDef[] {
       card: true,
       body: (
         <>
-          <p className="eyebrow">Weekly live coaching</p>
-          <h2 className="headline">Live calls every week. Real help in real time.</h2>
-          <p className="lede">Co build with the team. Watch other members build. Get unstuck fast. Nothing prerecorded.</p>
+          <p className="eyebrow">{teamCard.eyebrow}</p>
+          <h2 className="headline">{teamCard.headline}</h2>
+          <p className="lede">{teamCard.lede}</p>
         </>
       ),
     },
@@ -222,10 +246,8 @@ function buildOverlays(j: Journey): OverlayDef[] {
       card: true,
       body: (
         <>
-          <h2 className="headline center">
-            {stats.projects} live apps built inside {brand.name}.
-          </h2>
-          <p className="lede center">Every screen around you is a real member launch post.</p>
+          <h2 className="headline center">{solutionsCard.headline}</h2>
+          <p className="lede center">{solutionsCard.lede}</p>
         </>
       ),
     },
@@ -238,14 +260,14 @@ function buildOverlays(j: Journey): OverlayDef[] {
       card: true,
       body: (
         <>
-          <p className="eyebrow">Community</p>
-          <h2 className="headline">{stats.members} builders. One room.</h2>
-          <p className="lede">From San Francisco to Singapore, non technical founders build together. Find collaborators. Get feedback. Your cofounder might already be inside.</p>
+          <p className="eyebrow">{industriesCard.eyebrow}</p>
+          <h2 className="headline">{industriesCard.headline}</h2>
+          <p className="lede">{industriesCard.lede}</p>
         </>
       ),
     },
 
-    { id: "ch-launch", from: ["launch", -0.3], to: ["launch:hold", 0], place: "bottom", theme: "dark", body: <Chapter n="03" word="Launch" line="Now it happens." /> },
+    { id: "ch-launch", from: ["launch", -0.3], to: ["launch:hold", 0], place: "bottom", theme: "dark", body: <Chapter n="03" word={chapterCards.scale.word} line={chapterCards.scale.line} /> },
     ...stories.map(
       (s, i): OverlayDef => ({
         id: `s${i}`,
@@ -257,10 +279,10 @@ function buildOverlays(j: Journey): OverlayDef[] {
         interactive: true,
         body: (
           <>
-            <p className="eyebrow">{s.name} · Member</p>
+            <p className="eyebrow">{s.name} · {s.byline}</p>
             <h2 className="headline">“{s.quote}”</h2>
             <p className="lede">{s.detail}</p>
-            <PlayButton name={s.name} video={s.video} poster={s.screen} />
+            {(s.video || s.screen) && <PlayButton name={s.name} video={s.video} poster={s.screen} />}
           </>
         ),
       }),
@@ -274,14 +296,14 @@ function buildOverlays(j: Journey): OverlayDef[] {
       card: true,
       body: (
         <>
-          <h2 className="headline center">Real apps. Real builders. Real results.</h2>
+          <h2 className="headline center">{proofQuote.headline}</h2>
           <p className="lede center">
             “{proofQuote.quote}” <span className="muted">{proofQuote.name}</span>
           </p>
         </>
       ),
     },
-    { id: "numbers", from: ["numbers", -0.5], to: ["numbers:hold", 0], place: "bottom", theme: "dark", body: <p className="big-line">Build fast. Launch faster.</p> },
+    { id: "numbers", from: ["numbers", -0.5], to: ["numbers:hold", 0], place: "bottom", theme: "dark", body: <p className="big-line">{finale.numbersLine}</p> },
     {
       id: "final",
       from: ["final", -0.2],
@@ -291,15 +313,15 @@ function buildOverlays(j: Journey): OverlayDef[] {
       interactive: true,
       body: (
         <div className="final">
-          <h2 className="display center">Stop watching. Start building.</h2>
-          <p className="lede center">Join {stats.members} builders turning ideas into launched products.</p>
+          <h2 className="display center">{finale.headline}</h2>
+          <p className="lede center">{finale.lede}</p>
           <div className="actions center">
-            <JoinButton />
+            <JoinButton label={finale.primary} />
             <a className="btn btn-ghost" href="#plans">
-              See plans
+              {finale.secondary}
             </a>
           </div>
-          <p className="meta center">14 day money back guarantee</p>
+          <p className="meta center">{finale.note}</p>
         </div>
       ),
     },
@@ -368,7 +390,7 @@ export function Overlays({ journey: j }: { journey: Journey }) {
     gsap.ticker.add(tick);
 
     // chapter progress has done its job once the plans are on screen
-    const plans = document.getElementById("plans");
+    const plans = document.querySelector(".join");
     const io = new IntersectionObserver(([e]) => chrome.current?.classList.toggle("is-past", e.isIntersecting), { threshold: 0.05 });
     if (plans) io.observe(plans);
 
@@ -399,7 +421,7 @@ export function Overlays({ journey: j }: { journey: Journey }) {
       <div ref={chrome} className="chrome" data-theme="light">
         <header className="nav">
           <a href="#top" className="wordmark" aria-label={`${brand.name} home`} onClick={(e) => (e.preventDefault(), scroll.jump?.(0))}>
-            {brand.name}
+            <Logo />
           </a>
           <JoinButton small />
         </header>

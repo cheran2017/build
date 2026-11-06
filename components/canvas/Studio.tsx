@@ -119,11 +119,11 @@ function drawScreen(canvas: HTMLCanvasElement) {
 
   g.textAlign = "center";
   g.fillStyle = "#ffffff";
-  g.font = "800 300px 'Inter Tight', 'Inter', sans-serif";
+  g.font = "800 260px 'Inter Tight', 'Inter', sans-serif";
   g.fillText(brand.name, W / 2, H * 0.6);
   g.fillStyle = "#aeb3bf";
   g.font = "600 44px 'Inter Tight', 'Inter', sans-serif";
-  g.fillText("IDEA  →  BUILD  →  LAUNCH", W / 2, H * 0.74);
+  g.fillText("IDEA  →  BUILD  →  SCALE", W / 2, H * 0.74);
   g.fillStyle = "#3355ff";
   g.fillRect(W / 2 - 70, H * 0.8, 140, 8);
 }

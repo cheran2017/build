@@ -53,13 +53,13 @@ ok("canvas is aria-hidden", await page.evaluate(() => document.querySelector(".s
 await page.keyboard.press("Tab");
 ok("first Tab focuses 'Skip the 3D tour'", await page.evaluate(() => document.activeElement?.classList.contains("skip-link")));
 
-// chapter nav: jump to Launch
-await page.evaluate(() => [...document.querySelectorAll(".chapter-btn")].find((b) => b.textContent?.includes("Launch"))?.click());
+// chapter nav: jump to Scale
+await page.evaluate(() => [...document.querySelectorAll(".chapter-btn")].find((b) => b.textContent?.includes("Scale"))?.click());
 await new Promise((r) => setTimeout(r, 3500));
 const launchVisible = await page.evaluate(() =>
-  [...document.querySelectorAll(".ov")].some((s) => getComputedStyle(s).visibility === "visible" && s.textContent?.includes("Now it happens")),
+  [...document.querySelectorAll(".ov")].some((s) => getComputedStyle(s).visibility === "visible" && s.textContent?.includes("Now it scales")),
 );
-ok("chapter nav 'Launch' lands on the LAUNCH chapter card", launchVisible);
+ok("chapter nav 'Scale' lands on the SCALE chapter card", launchVisible);
 
 // story button opens the modal, Escape closes it
 await page.evaluate(() => window.scrollBy(0, window.innerHeight * 1.6));
@@ -92,7 +92,7 @@ ok("FAQ dialog opens", await page.evaluate(() => document.querySelector(".faq-di
 // classic view
 const classic = await browser.newPage();
 await classic.goto(`${base}?view=classic`, { waitUntil: "networkidle2" });
-ok("classic view renders all three chapters", await classic.evaluate(() => ["01 · Idea", "02 · Build", "03 · Launch"].every((t) => document.body.innerText.includes(t.toUpperCase()) || document.body.innerText.includes(t))));
+ok("classic view renders all three chapters", await classic.evaluate(() => ["01 · Idea", "02 · Build", "03 · Scale"].every((t) => document.body.innerText.includes(t.toUpperCase()) || document.body.innerText.includes(t))));
 ok("classic view loads no WebGL canvas", (await classic.$("canvas")) === null);
 
 console.log(errors.length ? `console errors:\n  ${[...new Set(errors)].join("\n  ")}` : "no console errors");

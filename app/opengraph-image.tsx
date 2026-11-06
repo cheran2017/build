@@ -10,10 +10,11 @@ export const alt = seo.shareAlt;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
+const logo = async (file: string) => `data:image/svg+xml;base64,${(await readFile(join(process.cwd(), "public", "brand", file))).toString("base64")}`;
 const font = (w: number) => readFile(join(process.cwd(), "public", "fonts", `inter-tight-${w}.woff`));
 
 export default async function Image() {
-  const [bold, medium] = await Promise.all([font(800), font(500)]);
+  const [bold, medium, blueLogo, whiteLogo] = await Promise.all([font(800), font(500), logo("logo.svg"), logo("logo-white.svg")]);
   const accent = brand.accent;
 
   return new ImageResponse(
@@ -32,8 +33,9 @@ export default async function Image() {
       >
         {/* left: wordmark + headline. Widths add up to the 1200 frame: 72 + 540 + 44 + 472 + 72 */}
         <div style={{ display: "flex", flexDirection: "column", width: 540 }}>
-          <div style={{ fontSize: 30, fontWeight: 800, letterSpacing: "0.14em", marginBottom: 40 }}>{brand.name}</div>
-          <div style={{ fontSize: 92, fontWeight: 800, lineHeight: 0.96, letterSpacing: "-0.035em" }}>{seo.shareHeadline}</div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={blueLogo} alt={brand.name} width={186} height={59} style={{ marginBottom: 40 }} />
+          <div style={{ fontSize: 74, fontWeight: 800, lineHeight: 1, letterSpacing: "-0.035em" }}>{seo.shareHeadline}</div>
           <div style={{ display: "flex", alignItems: "center", marginTop: 40 }}>
             <div style={{ width: 56, height: 6, borderRadius: 3, background: accent, marginRight: 18 }} />
             <div style={{ fontSize: 28, fontWeight: 500, color: "#3b3e46" }}>{seo.shareLine}</div>
@@ -56,8 +58,9 @@ export default async function Image() {
               boxShadow: "0 40px 80px -30px rgba(17,18,22,0.55)",
             }}
           >
-            <div style={{ fontSize: 100, fontWeight: 800, color: "#ffffff", letterSpacing: "0.02em" }}>{brand.name}</div>
-            <div style={{ fontSize: 18, fontWeight: 500, color: "#aeb3bf", letterSpacing: "0.2em", marginTop: 6 }}>IDEA · BUILD · LAUNCH</div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={whiteLogo} alt={brand.name} width={248} height={78} />
+            <div style={{ fontSize: 18, fontWeight: 500, color: "#aeb3bf", letterSpacing: "0.2em", marginTop: 6 }}>IDEA · BUILD · SCALE</div>
             <div style={{ width: 70, height: 5, background: accent, marginTop: 18 }} />
           </div>
           {/* laptop base */}

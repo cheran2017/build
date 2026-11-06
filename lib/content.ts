@@ -1,10 +1,10 @@
 /**
  * Every word, number and asset path the site shows lives here.
  *
- * REF = reference content from the aibuilders.vip/new asset pack this build is modelled on.
- * It makes the experience feel real during development, but it describes AI Builders'
- * founder, members and results. Replace every REF value with UTN's own before publishing.
- * Testimonials are quoted verbatim: replace them whole, never edit them to say "UTN".
+ * Copy, figures, leadership and client quotes come from https://metayb.ai/. Client quotes are verbatim (whole
+ * sentences, never reworded). Images are published from assets/ by `npm run media`; the Metayb set is composed by
+ * scripts/compose-metayb-assets.mjs from files on the site.
+ * 3D labels use Inter Tight's Latin set (A-Z 0-9 + $ % . , ! ? & - / '): no arrows or emoji.
  */
 
 import media from "./media.json";
@@ -25,75 +25,134 @@ function mediaSlot(slot: string) {
 }
 
 export const brand = {
-  name: "UTN",
+  name: "Metayb",
+  /** logo files in public/brand: the blue wordmark, and a white one for dark backgrounds */
+  logo: "/brand/logo.svg",
+  logoWhite: "/brand/logo-white.svg",
   accent: "#3355FF",
-  tagline: "Build your app with AI.",
+  tagline: "AI-native enterprise transformation.",
 };
 
 /** Search and share previews (page title, meta description, the generated share image). */
 export const seo = {
-  title: `${brand.name} · Build your app with AI`,
+  title: "AI Consulting & Digital Transformation Services | Metayb",
   description:
-    "Go from idea to a launched product in 21 days. No code. No developers. Training, weekly live coaching, and a community of builders launching real apps with AI.", // REF: 21 days / coaching claims
-  shareHeadline: "Build your app with AI.",
-  shareLine: "From idea to a launched product.",
-  shareAlt: `${brand.name}: Build your app with AI. Idea, build, launch.`,
+    "Transform your enterprise with Metayb's AI consulting, data analytics, automation and cloud solutions. Streamline operations. Book a free consultation today.",
+  shareHeadline: "AI-native transformation.",
+  shareLine: "AI, data, cloud and automation for the enterprise.",
+  shareAlt: `${brand.name}: AI-native enterprise transformation. Idea, build, scale.`,
+};
+
+export const contact = {
+  email: "info@metayb.ai",
+  phone: "+91 93619 63901",
+  address: "ALG Towers, 3rd Floor, Plot No. 48, Industrial Estate Main Road, Chennai 600096, India",
 };
 
 export const links = {
-  join: "#plans", // TODO: UTN signup / community URL
-  checkout: "#plans", // TODO: UTN checkout URL
-  terms: "#", // TODO
-  privacy: "#", // TODO
+  join: "https://metayb.ai/contact-us/",
+  consult: "https://metayb.ai/contact-us/",
+  email: `mailto:${contact.email}`,
+  /** No standalone terms page was found on metayb.ai; the footer hides the link while this is null. */
+  terms: null as string | null,
+  privacy: "https://metayb.ai/privacy-policy",
 };
 
+/** Figures from metayb.ai: the "impact" counters, plus counts of its own solution and industry lists. */
 export const stats = {
-  members: "500+", // REF
-  projects: "275+", // REF
-  days: "21", // REF
-  followers: "1M", // REF
+  team: "500+",
+  brands: "20+",
+  portfolio: "$2B",
+  countries: "12+",
+  solutions: "8+",
+  industries: "7",
+  phases: "3",
 };
 
 export const hero = {
   eyebrow: brand.name,
-  title: ["Build your app", "with AI."],
-  lede: `Go from idea to a launched product in ${stats.days} days. No code. No developers. A proven path, and ${stats.members} builders beside you.`, // REF numbers
-  laptopCaption: "Every product in this story started on a laptop like this one.",
+  title: ["AI-native", "transformation."],
+  lede: "Metayb helps enterprises modernize and automate through AI, technology, data analytics and cloud solutions.",
+  laptopCaption: "Every transformation starts with a screen like this one.",
   enter: "Step inside.",
 };
 
+export const chapterCards = {
+  idea: { word: "Idea", line: "Every transformation starts here." },
+  build: { word: "Build", line: "Welcome to the engine room." },
+  scale: { word: "Scale", line: "Now it scales." },
+};
+
+/** Floating idea notes: the kind of use cases Metayb helps teams find and build. */
 export const ideaNotes = [
-  "A tool for dog walkers",
-  "Invoices, but simple",
-  "What if my spreadsheet was an app?",
-  "Booking for my salon",
-  "AI coach for runners",
-  "Marketplace for local makers",
-  "Habit tracker that texts you",
-  "CRM for wedding planners",
+  "Forecast demand with AI",
+  "Match invoices automatically",
+  "Predict machine failures",
+  "One view of every warehouse",
+  "A copilot for support teams",
+  "Live plant dashboards",
+  "Move workloads to the cloud",
+  "Close the books faster",
 ];
 
 export const whoFor = [
-  "You feel stuck and want real control of your future.",
-  "You want income you control, not income a boss decides.",
-  "You want to build something real, even if you never have.",
+  "Manufacturing, automotive and logistics teams connecting plants, suppliers and data.",
+  "Retail, consumer goods and finance teams streamlining reporting, planning and operations.",
+  "Pharma and agriculture teams modernizing workflows with cloud, analytics and IoT.",
 ];
 
-// REF: founder identity, photo, badge and follower counts
-export const founder = {
-  name: "Marcin",
-  photo: "/media/scenes/founder.webp",
-  photoAlt: "The founder holding the startup achievement award",
-  badge: "/media/scenes/skool-badge.webp",
-  bio: "I help people with zero coding experience build their own software and break free from the 9 to 5. We don’t waste time. We build. We launch. We learn by doing.",
-  socials: [
-    { value: "506.3K", label: "TikTok followers" },
-    { value: "41.8K", label: "YouTube subscribers" },
-    { value: "50.8K", label: "Instagram followers" },
+export const about = {
+  eyebrow: "What Metayb is",
+  headline: "An AI-native enterprise transformation company.",
+  lede: "Metayb helps businesses modernize and automate through AI, technology, data analytics and cloud solutions.",
+  whoEyebrow: "Who it’s for",
+  whoHeadline: "Your operations. Our AI, data and engineering.",
+  clientsEyebrow: "Clients",
+  clientsHeadline: `${stats.brands} brands served across SAP, CPG, finance and enterprise technology.`,
+  clientsLede: "Real transformation stories from clients who have partnered with Metayb across SAP, digital operations, CPG, finance and enterprise technology.",
+  mistakeLine: "Technology is the easier half of enterprise AI adoption.",
+  mistakeMuted: "The harder half is people.",
+};
+
+// Leadership as published on metayb.ai/leadership ("Leaders Driving Our Vision Forward"), in the site's order
+export const leadership = {
+  eyebrow: "Leadership",
+  title: "Leaders Driving Our Vision Forward",
+  lede: "Our leadership team brings together deep expertise and a shared passion for innovation, empowering Metayb to deliver real impact.",
+  leaders: [
+    { name: "Amit Todi", role: "Founder & CEO", bio: "Driving Metayb’s vision by transforming ideas into impactful digital and AI-powered business solutions.", photo: "/media/leaders/amit-todi.webp", badge: "/media/leaders/badge-amit-todi.webp" },
+    { name: "Shweta Todi", role: "Co-Founder & CFO", bio: "Steering financial strategy and governance to enable sustainable growth and long-term business success.", photo: "/media/leaders/shweta-todi.webp", badge: "/media/leaders/badge-shweta-todi.webp" },
+    { name: "Vikash Parmanandka", role: "Executive Director", bio: "Driving business growth by aligning strategy, sales, operations, and execution to build scalable businesses and deliver long-term value.", photo: "/media/leaders/vikash-parmanandka.webp", badge: "/media/leaders/badge-vikash-parmanandka.webp" },
+    { name: "Varun Selvan", role: "Senior Director - Technology", bio: "Leading technology innovation by building scalable, future-ready solutions that accelerate digital transformation.", photo: "/media/leaders/varun-selvan.webp", badge: "/media/leaders/badge-varun-selvan.webp" },
+    { name: "Narendra Anant Patil", role: "Delivery Head – Internet of Things (IoT)", bio: "Delivering intelligent IoT solutions that help businesses unlock operational efficiency and connected innovation.", photo: "/media/leaders/narendra-anant-patil.webp", badge: "/media/leaders/badge-narendra-anant-patil.webp" },
+    { name: "Pradeep Manoharan", role: "Delivery Head - Cyber Security", bio: "Leading cybersecurity strategy and resilience by safeguarding enterprise systems, data, and digital operations with a security-first approach.", photo: "/media/leaders/pradeep-manoharan.webp", badge: "/media/leaders/badge-pradeep-manoharan.webp" },
+    { name: "Rameshbabu", role: "Director – Data Engineering", bio: "Empowering organizations with robust data engineering capabilities that transform data into actionable insights.", photo: "/media/leaders/rameshbabu.webp", badge: "/media/leaders/badge-rameshbabu.webp" },
+    { name: "Sanjay Kumar", role: "Delivery Head – Supply Chain Management (SCM)", bio: "Leading end-to-end supply chain transformation by delivering scalable, efficient, and technology-driven SCM solutions that optimize business performance.", photo: "/media/leaders/sanjay-kumar.webp", badge: "/media/leaders/badge-sanjay-kumar.webp" },
+    { name: "Manish Kumar", role: "Delivery Head - Senior Solutions Architect (SAP)", bio: "Leading SAP solutions and enterprise architecture to help organizations streamline operations and accelerate business transformation.", photo: "/media/leaders/manish-kumar.webp", badge: "/media/leaders/badge-manish-kumar.webp" },
+    { name: "Suresh Kumar", role: "Solution Architect", bio: "Designing scalable, future-ready technology solutions that align business objectives with seamless digital transformation.", photo: "/media/leaders/suresh-kumar.webp", badge: "/media/leaders/badge-suresh-kumar.webp" },
+    { name: "Shantham Sood", role: "Senior Program Manager", bio: "Driving strategic programs with precision, fostering cross-functional collaboration, and ensuring successful delivery of business and technology initiatives.", photo: "/media/leaders/shantham-sood.webp", badge: "/media/leaders/badge-shantham-sood.webp" },
+    { name: "Sunitha Hattangadi", role: "Head of Human Resources", bio: "Cultivating a people-first culture by fostering talent, collaboration, and organizational excellence.", photo: "/media/leaders/sunitha-hattangadi.webp", badge: "/media/leaders/badge-sunitha-hattangadi.webp" },
   ],
 };
 
-// REF: creator follower badges and collab collage
+// The 3D leadership stop features the founder; everyone else is in the leadership section below the journey
+export const founder = {
+  name: "Amit Todi",
+  photo: "/media/scenes/founder.webp",
+  photoAlt: "Amit Todi, Founder and CEO of Metayb",
+  badge: "/media/scenes/skool-badge.webp",
+  eyebrow: leadership.eyebrow,
+  headline: leadership.title + ".",
+  bio: leadership.lede,
+  cta: `Meet all ${leadership.leaders.length} leaders`,
+  socials: [
+    { value: stats.team, label: "Strong team" },
+    { value: stats.brands, label: "Brands served" },
+    { value: stats.countries, label: "Countries" },
+  ],
+};
+
+// Social-proof strips (figures above) and the client-logo card
 export const creatorBadges = mediaIn("creators");
 export const communityCollage = "/media/scenes/community-collage.webp";
 export const ideaIcon = "/media/scenes/icon-idea.webp";
@@ -102,32 +161,54 @@ export const framework = [
   {
     n: "01",
     icon: "/media/framework/part-1-idea.webp",
-    title: "Pick your idea.",
-    short: "Find an idea that can actually make money.",
-    body: "A 48 hour audit finds the idea already in you, or validates the one you have.",
+    title: "AI, data and analytics.",
+    short: "Turn enterprise data into decisions.",
+    body: "AI consulting, data analytics and business intelligence that identify use cases and embed AI into daily operations.",
   },
   {
     n: "02",
     icon: "/media/framework/part-2-build.webp",
-    title: "Build your first project.",
-    short: "Ship in as little as 10 days.",
-    body: "Step by step training, prompts, and tech help when you’re stuck. AI does the hard part. You lead the vision.",
+    title: "Cloud and engineering.",
+    short: "Modernize on AWS, Azure or Google Cloud.",
+    body: "Cloud consulting, migration, application modernization and enterprise integrations built to scale.",
   },
   {
     n: "03",
     icon: "/media/framework/part-3-launch.webp",
-    title: "Launch and get customers.",
-    short: "Put it in front of real users in days.",
-    body: "Landing pages, email sequences, launch checklists. Don’t just build it. Sell it.",
+    title: "Automation, ERP and IoT.",
+    short: "Connect operations end to end.",
+    body: "Intelligent automation, SAP and ERP implementation, and IoT that streamline workflows and give real-time visibility.",
   },
 ];
 
-export const coachingCall = "/media/scenes/coaching-call.webp"; // REF
-export const membersMap = "/media/scenes/members-map.webp"; // REF
-export const buildersFaces = "/media/scenes/builders-faces.webp"; // REF
+export const phasesCard = {
+  headline: `From readiness to scale in ${stats.phases} phases.`,
+  lede: "Assess readiness, scale what works, then embed and expand. Change management runs alongside the technology.",
+};
 
-// REF: real AI Builders member launch posts
-export const launches = mediaIn("gallery").map((src, i) => ({ src, title: `Member launch post ${i + 1}` }));
+export const teamCard = {
+  eyebrow: "One point of contact",
+  headline: "One team for strategy, technology, operations and growth.",
+  lede: "Dedicated specialists work alongside yours, from the first workshop to delivery.",
+};
+
+export const solutionsCard = {
+  headline: "AI, data, cloud, ERP, automation, cybersecurity and IoT.",
+  lede: "Eight solution areas, one connected delivery team.",
+};
+
+export const industriesCard = {
+  eyebrow: "Industries",
+  headline: `${stats.industries} industries. One partner.`,
+  lede: "Manufacturing, automotive, logistics, retail, pharma, finance and agriculture. Wherever your operations are, we connect plants, suppliers and data.",
+};
+
+export const coachingCall = "/media/scenes/coaching-call.webp"; // the Metayb team
+export const membersMap = "/media/scenes/members-map.webp"; // reach: 12+ countries
+export const buildersFaces = "/media/scenes/builders-faces.webp"; // leaders at AI Impact Expo 2026
+
+// Capability diagrams from metayb.ai/solutions
+export const launches = mediaIn("gallery").map((src, i) => ({ src, title: `Metayb solution diagram ${i + 1}` }));
 
 /**
  * `count` items taken from `list` starting at `from`, wrapping around, so layouts built for many screens
@@ -147,119 +228,165 @@ export const ambient = {
   laptopScreen: mediaSlot("ambient/laptop-screen"),
   /** huge backdrop above the IDEA word, 16:9 */
   idea: mediaSlot("ambient/idea"),
-  /** backdrop revealed behind LAUNCH as its letters lift off, 16:9 */
+  /** backdrop revealed behind SCALE as its letters lift off, 16:9 */
   launch: mediaSlot("ambient/launch"),
 };
 
 export type Story = {
   id: string;
+  /** the client speaking */
   name: string;
+  /** their role and company, e.g. "CTO, Tolaram" */
+  byline: string;
   stat: string;
   statLabel: string;
   quote: string;
   detail: string;
-  /** Launch post screenshot shown on the floating screen. null = designed poster instead. */
+  /** Screenshot shown on the floating screen. null = designed poster instead. */
   screen: string | null;
-  /** Video embed (Wistia/YouTube iframe URL) or .mp4. null until UTN has the real video. */
+  /** Video embed (Wistia/YouTube iframe URL) or .mp4. null until Metayb has the real video. */
   video: string | null;
 };
 
-// REF: every story below is an AI Builders member, quoted verbatim
+// Client testimonials as published on metayb.ai. The quote is one whole sentence, the detail is the next sentence, both verbatim.
 export const stories: Story[] = [
   {
-    id: "drew",
-    name: "Drew Griffin",
-    stat: "$200K+",
-    statLabel: "revenue",
-    quote: "AI Builders is grossly underpriced for what you get.",
-    detail: "Drew launched SendPush.io and has passed $200K in revenue.",
-    screen: "/media/wins/win-01.webp",
-    video: null,
-  },
-  {
-    id: "pedro",
-    name: "Pedro",
-    stat: "36 hrs",
-    statLabel: "to a B2B SaaS",
-    quote: "In 36 hours to a fully functional B2B SaaS. Vibe coded.",
-    detail: "Pedro was stuck getting his software off the ground. A few weeks after joining, he built it in 36 hours.",
+    id: "tolaram-cto",
+    name: "Kavinkumar M",
+    byline: "CTO, Tolaram",
+    stat: "15+",
+    statLabel: "SAP implementations",
+    quote: "Metayb has been instrumental in over 15 SAP implementations and several digital initiatives.",
+    detail: "Their work has streamlined today's operations while building a strong foundation for our digital future.",
     screen: null,
     video: null,
   },
   {
-    id: "adam",
-    name: "Adam",
-    stat: "7 days",
-    statLabel: "to the App Store",
-    quote: "AI Builders helped me get my app live on the App Store in 7 days.",
-    detail: "Adam had never launched software before. His first mobile app is live on the App Store.",
+    id: "tolaram-ceo",
+    name: "Pawan Sharma",
+    byline: "CEO, Tolaram",
+    stat: "3 years",
+    statLabel: "reshaping CPG digitally",
+    quote: "Metayb has played a pivotal role in reshaping our CPG business digitally.",
+    detail: "Their consistency, problem-solving mindset, and dedication over the last three years have made a meaningful impact across Africa.",
     screen: null,
     video: null,
   },
   {
-    id: "krzysztof",
-    name: "Krzysztof",
-    stat: "3 exits",
-    statLabel: "SaaS sold",
-    quote: "Marcin helped me build and sell 3 SaaS businesses.",
-    detail: "Krzysztof started with the YouTube videos, built his own SaaS products, and just sold his third.",
-    screen: "/media/wins/win-02.webp",
+    id: "tolaram-cfo",
+    name: "Sandeep Parasramka",
+    byline: "CFO, Tolaram",
+    stat: "Large scale",
+    statLabel: "business transformation",
+    quote: "From SAP implementations to large-scale business transformation, Metayb has delivered with clarity, ownership, and reliability.",
+    detail: "They have quickly become an integral part of our progress.",
+    screen: null,
     video: null,
   },
   {
-    id: "misty",
-    name: "Misty",
-    stat: "First app", // 3D labels use Inter Tight's Latin set: no arrows or emoji
-    statLabel: "no tech background",
-    quote: "The community massively increased my productivity.",
-    detail: "Misty had no tech experience. With the community behind her, she launched her app CartoViva.",
+    id: "tolaram-md",
+    name: "Deepak Singhal",
+    byline: "Executive Director and MD Consumer Business, Tolaram",
+    stat: "Speed",
+    statLabel: "and discipline",
+    quote: "Metayb has been an exceptional partner in our digital and operational transformation.",
+    detail: "Their speed, discipline, and commitment to excellence make them a trusted force behind our growth story.",
+    screen: null,
+    video: null,
+  },
+  {
+    id: "catalyst",
+    name: "Kam",
+    byline: "Catalyst",
+    stat: "Real time",
+    statLabel: "finance visibility",
+    quote: "Metayb has transformed how we manage finance across our ecommerce business.",
+    detail: "Their proactive insights, accurate reporting, and highly responsive team give us complete confidence in every financial decision.",
     screen: null,
     video: null,
   },
 ];
 
-// REF
-export const proofQuote = {
-  quote: "AI is the biggest disruption in tech history, and we can now use it.",
-  name: "Daniel Burns",
-  screen: "/media/wins/win-03.webp",
+export const storiesCard = {
+  headline: "What clients say.",
+  more: "Explore",
+  moreEmpty: "Details coming soon.",
 };
 
-// REF: pricing and guarantee
-export const plans = [
-  { name: "Standard", price: "$67", period: "/month", note: "Cancel anytime", featured: false },
-  { name: "Premium", price: "$399", period: "/year", note: "Save $405 vs monthly", featured: true },
-];
+export const proofQuote = {
+  quote: "Their team is consistently proactive, dependable and highly responsive, giving us the confidence that our technology needs are in capable hands.",
+  name: "Manish Tibrewal, Co-Founder, Farro Capital",
+  screen: "/media/wins/win-03.webp", // the Metayb team
+  headline: "Trusted by growing brands.",
+};
+
+export const finale = {
+  numbersLine: "Modernize. Automate. Grow.",
+  headline: "Ready to transform your enterprise?",
+  lede: "Talk to our transformation experts and see where AI can help.",
+  primary: "Book a free consultation",
+  secondary: "Get in touch",
+  note: "Free consultation. No commitment.",
+};
+
+/** Contact section (replaces the old pricing plans). */
+export const engage = {
+  eyebrow: "Contact",
+  title: "Let’s talk about your transformation.",
+  options: [
+    {
+      name: "Free consultation",
+      price: "Free",
+      period: " to start",
+      note: "Share your key goals with our team.",
+      cta: "Book a consultation",
+      href: links.consult,
+      featured: true,
+    },
+    {
+      name: "Write to us",
+      price: "Email",
+      period: ` ${contact.email}`,
+      note: `${contact.phone} · Chennai, India`,
+      cta: "Send an email",
+      href: links.email,
+      featured: false,
+    },
+  ],
+  badge: "Start here",
+  includedTitle: "Every engagement includes",
+  guarantee: "Free consultation.",
+  guaranteeNote: "Tell us your goals and we will show where AI, data and automation can help.",
+};
 
 export const included = [
-  "3 part framework: Idea, Build, Launch",
-  "Step by step training videos",
-  "Weekly live coaching and co building",
-  `Community of ${stats.members} builders`,
-  "Tech support and launch resources",
+  "AI readiness and roadmap",
+  "Data, analytics and cloud engineering",
+  "SAP, ERP and intelligent automation",
+  "IoT and cybersecurity expertise",
+  "One team, one point of contact",
 ];
 
-export const guarantee = "14 day money back guarantee."; // REF
+export const faqTitle = "Questions, answered.";
 
 export const faqs = [
   {
-    q: "I have a 9 to 5. Do I have time for this?",
-    a: "It’s built for people with full time jobs, kids, and packed schedules. Most members spend 30 to 60 minutes a day.",
+    q: "How do I get started with Metayb?",
+    a: "Book a free consultation and share your key goals. Our team will help identify where AI, data and automation can make the biggest difference.",
   },
   {
-    q: "I’m not technical at all. I’ve never coded.",
-    a: "That’s exactly who this is for. If you’ve used ChatGPT, you already have the base skills.",
+    q: "How long does an engagement take, and how is it priced?",
+    a: "It depends on scope. We typically work in phases: assess readiness, scale what works, then embed and expand. Contact us for a scoped proposal.",
   },
   {
-    q: "What if I build something and no one wants it?",
-    a: "That’s why we start with picking the right idea, not with building. You learn to validate before you spend time building.",
+    q: "Which industries do you work with?",
+    a: "Manufacturing, automotive, logistics, retail, pharma, finance and agriculture, along with consumer goods and enterprise technology.",
   },
 ];
 
 /** Every texture the 3D scene uses, preloaded behind the loader. */
 export const sceneTextures = [
-  founder.photo,
-  founder.badge,
+  ...leadership.leaders.flatMap((l) => [l.photo, l.badge]),
   communityCollage,
   ideaIcon,
   ...creatorBadges,

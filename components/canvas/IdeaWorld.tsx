@@ -3,9 +3,10 @@
 import { useLayoutEffect, useMemo, useRef } from "react";
 import { useFrame, type ThreeElements } from "@react-three/fiber";
 import { Float, Grid, Line } from "@react-three/drei";
-import { Color, Group, InstancedMesh, MeshStandardMaterial, Object3D } from "three";
-import { ambient, communityCollage, creatorBadges, founder, ideaIcon, ideaNotes } from "@/lib/content";
-import type { Spot } from "@/lib/journey";
+import { Color, Group, InstancedMesh, MathUtils, MeshStandardMaterial, Object3D } from "three";
+import { ambient, communityCollage, creatorBadges, ideaIcon, ideaNotes, leadership } from "@/lib/content";
+import { LEADER_LEAD, LEADER_STEP, type Spot } from "@/lib/journey";
+import { scroll } from "@/lib/store";
 import { AmbientPanel, ImagePanel, Label, Word3D, slabGeometry, useJourney, useVisibleBetween } from "./parts";
 
 type GroupProps = Omit<ThreeElements["group"], "ref">;
@@ -68,8 +69,7 @@ export function IdeaWorld() {
       </At>
 
       <At spot={L.idea.i4}>
-        <ImagePanel src={founder.photo} w={4.4} frame="light" r={0.3} pad={0.12} position={[0, 0.7, 0]} />
-        <ImagePanel src={founder.badge} w={5.2} frame="none" r={0.2} position={[0.4, -3.3, 0.9]} />
+        <LeaderStrip />
       </At>
 
       {/* scattered fragments along the route */}
@@ -84,6 +84,51 @@ export function IdeaWorld() {
         <Note text={ideaNotes[6]} position={[-18, 14, -196]} rotation={[0, 0.5, 0.04]} />
         <Note text={ideaNotes[7]} position={[19, 3, -140]} rotation={[0, -0.5, -0.05]} />
       </Float>
+    </group>
+  );
+}
+
+/**
+ * Every leader's portrait and name card in one row. The row slides left as the scroll moves through the leadership
+ * stop: each leader settles for the first half of their step, then the strip eases across to the next one.
+ */
+function LeaderStrip() {
+  const j = useJourney();
+  const strip = useRef<Group>(null);
+  const items = useRef<(Group | null)[]>([]);
+  const n = leadership.leaders.length;
+  const gap = j.mobile ? 6.2 : 7.6;
+  const reach = j.mobile ? 0.9 : 1.55;
+  const start = useMemo(() => j.p("i4", LEADER_LEAD), [j]);
+  const end = useMemo(() => j.p("i4", LEADER_LEAD + (n - 1) * LEADER_STEP), [j, n]);
+
+  useFrame(() => {
+    const t = MathUtils.clamp((scroll.progress - start) / (end - start), 0, 1) * (n - 1);
+    const base = Math.min(Math.floor(t), n - 1);
+    const f = t - base;
+    const idx = base + (base < n - 1 ? MathUtils.smootherstep(f, 0.5, 1) : 0);
+    if (strip.current) strip.current.position.x = -idx * gap;
+    items.current.forEach((g, i) => {
+      if (!g) return;
+      const d = i - idx;
+      const a = Math.abs(d);
+      // the previous leader trails off to the left; the next one stays hidden until the strip starts sliding
+      g.visible = d > -reach && d < 0.995;
+      const s = 1 - 0.18 * Math.min(a, 1);
+      g.scale.setScalar(s);
+      g.position.z = -a * 1.4;
+      g.rotation.y = -d * 0.22;
+    });
+  });
+
+  return (
+    <group ref={strip}>
+      {leadership.leaders.map((l, i) => (
+        <group key={l.name} ref={(g) => void (items.current[i] = g)} position={[i * gap, 0, 0]} visible={i === 0}>
+          <ImagePanel src={l.photo} w={4.4} frame="light" r={0.3} pad={0.12} position={[0, 0.7, 0]} />
+          <ImagePanel src={l.badge} w={5.2} frame="none" r={0.2} position={[0.4, -3.3, 0.9]} />
+        </group>
+      ))}
     </group>
   );
 }

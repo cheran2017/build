@@ -1,9 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { brand, faqs, guarantee, included, links, plans } from "@/lib/content";
-import { scroll, setUI, useUI } from "@/lib/store";
-import { Arrow } from "./Buttons";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { brand, engage, faqTitle, faqs, included, leadership, links, storiesCard } from "@/lib/content";import { scroll, setUI, useUI } from "@/lib/store";
+import { Arrow, Logo } from "./Buttons";
+
+/** True for the hidden server-rendered copy behind the loader: no <img> requests there (see ClassicView). */
+export const TextOnly = createContext(false);
 
 export function Loader() {
   const ready = useUI((u) => u.ready);
@@ -17,7 +19,7 @@ export function Loader() {
   if (gone) return null;
   return (
     <div className={`loader${ready ? " is-done" : ""}`} role="status" aria-live="polite">
-      <p className="loader-mark">{brand.name}</p>
+      <Logo className="loader-mark" />
       <div className="loader-bar">
         <span style={{ transform: `scaleX(${Math.max(0.04, loaded / 100)})` }} />
       </div>
@@ -62,7 +64,7 @@ export function VideoModal() {
         ) : (
           <div className="modal-empty">
             <p className="headline">{video.title}</p>
-            <p className="lede">Video coming soon.</p>
+            <p className="lede">{storiesCard.moreEmpty}</p>
           </div>
         )}
       </div>
@@ -77,33 +79,56 @@ export function VideoModal() {
 
 export function JoinSection() {
   const faq = useRef<HTMLDialogElement>(null);
+  const textOnly = useContext(TextOnly);
   return (
     <div className="join">
+      <section id="leadership" className="leaders" aria-labelledby="leaders-title">
+        <div className="leaders-inner">
+          <p className="eyebrow center">{leadership.eyebrow}</p>
+          <h2 id="leaders-title" className="section-title center">
+            {leadership.title}
+          </h2>
+          <p className="lede center">{leadership.lede}</p>
+          <ul className="leader-grid">
+            {leadership.leaders.map((l) => (
+              <li key={l.name} className="leader">
+                {!textOnly && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={l.photo} alt={`${l.name}, ${l.role}`} width={286} height={197} loading="lazy" />
+                )}
+                <h3>{l.name}</h3>
+                <p className="leader-role">{l.role}</p>
+                <p className="leader-bio">{l.bio}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
       <section id="plans" className="plans" aria-labelledby="plans-title">
         <div className="plans-inner">
-          <p className="eyebrow center">Plans</p>
+          <p className="eyebrow center">{engage.eyebrow}</p>
           <h2 id="plans-title" className="section-title center">
-            Choose the plan that fits you.
+            {engage.title}
           </h2>
           <div className="plan-grid">
-            {plans.map((p) => (
+            {engage.options.map((p) => (
               <article key={p.name} className={`plan${p.featured ? " plan-featured" : ""}`}>
-                {p.featured && <span className="plan-badge">Best value</span>}
+                {p.featured && <span className="plan-badge">{engage.badge}</span>}
                 <h3 className="plan-name">{p.name}</h3>
                 <p className="plan-price">
                   <strong>{p.price}</strong>
                   <span>{p.period}</span>
                 </p>
                 <p className="plan-note">{p.note}</p>
-                <a className={`btn ${p.featured ? "btn-primary" : "btn-dark"} btn-block`} href={links.checkout}>
-                  <span>Get started</span>
+                <a className={`btn ${p.featured ? "btn-primary" : "btn-dark"} btn-block`} href={p.href}>
+                  <span>{p.cta}</span>
                   <Arrow />
                 </a>
               </article>
             ))}
           </div>
           <div className="plan-included">
-            <p className="plan-included-title">Both plans include</p>
+            <p className="plan-included-title">{engage.includedTitle}</p>
             <ul className="plan-list">
               {included.map((t) => (
                 <li key={t}>{t}</li>
@@ -111,7 +136,7 @@ export function JoinSection() {
             </ul>
           </div>
           <p className="guarantee">
-            <strong>{guarantee}</strong> Try it. If it doesn’t work for you, you get your money back.
+            <strong>{engage.guarantee}</strong> {engage.guaranteeNote}
           </p>
         </div>
       </section>
@@ -122,7 +147,7 @@ export function JoinSection() {
         <button type="button" className="footer-link" onClick={() => faq.current?.showModal()}>
           FAQ
         </button>
-        <a href={links.terms}>Terms</a>
+        {links.terms && <a href={links.terms}>Terms</a>}
         <a href={links.privacy}>Privacy</a>
       </footer>
       <dialog
@@ -134,7 +159,7 @@ export function JoinSection() {
       >
         <div className="faq-inner">
           <div className="faq-head">
-            <h2 id="faq-title">Questions, answered.</h2>
+            <h2 id="faq-title">{faqTitle}</h2>
             <button type="button" className="faq-close" aria-label="Close" onClick={() => faq.current?.close()} />
           </div>
           {faqs.map((f) => (

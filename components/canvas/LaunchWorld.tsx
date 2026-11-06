@@ -104,7 +104,7 @@ function Monolith({ story, spot }: { story: Story; spot: Spot }) {
           {`“${story.quote}”`}
         </Label>
         <Label position={[-2.2, -4.9, 0.02]} anchorX="left" fontSize={0.3} color="#aeb3bf" weight={500}>
-          {`${story.name} · Member`}
+          {`${story.name} · ${story.byline}`}
         </Label>
       </group>
       <VideoScreen
